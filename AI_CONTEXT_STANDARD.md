@@ -2,8 +2,8 @@
 
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
-**Date**: March 25, 2026  
-**Version**: 0.8 (Draft)
+**Date**: March 26, 2026  
+**Version**: 0.8.1 (Draft)
 
 ---
 
@@ -122,7 +122,7 @@ code --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
 
 ```markdown
 ---
-mode: ask
+agent: ask
 description: セッション初期化（PROJECT_STATUS.md の読み込みと確認）
 alwaysApply: true
 ---
@@ -1814,6 +1814,9 @@ This is v0.1 - still being validated through actual use.
 ---
 
 ## Version History
+
+**v0.8.1** (March 26, 2026)
+- **Corrected `init.prompt.md` frontmatter key**: `mode: ask` → `agent: ask`. VS Code deprecated `mode` in favour of `agent` for prompt file frontmatter; using `mode` produces a deprecation warning. All `init.prompt.md` files in compliant repos should use `agent: ask`.
 
 **v0.7** (March 24, 2026)
 - **Complete migration to native auto-load**: `.github/copilot-instructions.md` is now the sole initialization mechanism
