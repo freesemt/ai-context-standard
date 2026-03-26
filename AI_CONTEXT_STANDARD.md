@@ -539,75 +539,32 @@ For each major section in each file, verify:
 2. **If `application/vnd.code.notebook.stdout` is present** → do NOT call `read_notebook_cell_output`; use the script below instead
 3. **If only `image/png`, `text/plain`, or similar non-stdout types** → `read_notebook_cell_output` is fine
 
-**Recommended tool**: A small Python script that reads cell outputs directly from the `.ipynb` JSON file, bypassing the tool size limit entirely.
+**Recommended tool**: [`ai-context-tools`](https://github.com/freesemt/ai-context-tools) — a zero-dependency Python package that reads cell outputs directly from the `.ipynb` JSON file, bypassing the tool size limit entirely.
 
-Create `read_cell_output.py` at the repository root:
-
-```python
-"""
-read_cell_output.py — Read stdout output of a specific notebook cell.
-
-Usage:
-    python read_cell_output.py <notebook.ipynb> <cell_number> [max_lines]
-
-Arguments:
-    notebook     Path to the .ipynb file
-    cell_number  1-based cell number (matches VS Code display)
-    max_lines    Max lines to print (default: 100, 0 = all)
-"""
-import json, sys
-
-def read_cell_output(nb_path, cell_number, max_lines=100):
-    with open(nb_path, encoding='utf-8') as f:
-        nb = json.load(f)
-    cells = nb['cells']
-    if cell_number < 1 or cell_number > len(cells):
-        print(f"Error: cell_number {cell_number} out of range (1–{len(cells)})")
-        sys.exit(1)
-    cell = cells[cell_number - 1]
-    if cell['cell_type'] != 'code':
-        print(f"Cell {cell_number} is a markdown cell — no output.")
-        sys.exit(0)
-    outputs = cell.get('outputs', [])
-    if not outputs:
-        print(f"Cell {cell_number} has no outputs.")
-        return
-    print(f"Cell {cell_number} (execution_count={cell.get('execution_count')}):")
-    print()
-    for out in outputs:
-        out_type = out.get('output_type', '')
-        if out_type == 'stream':
-            text = ''.join(out.get('text', []))
-            lines = text.splitlines()
-            if max_lines and len(lines) > max_lines:
-                for line in lines[:max_lines]: print(line)
-                print(f"... ({len(lines) - max_lines} more lines, use max_lines=0 to see all)")
-            else:
-                print(text, end='' if text.endswith('\n') else '\n')
-        elif out_type in ('execute_result', 'display_data'):
-            data = out.get('data', {})
-            if 'text/plain' in data:
-                print(f"[{out_type}] {''.join(data['text/plain'])}")
-            else:
-                print(f"[{out_type}] (mime types: {list(data.keys())})")
-        elif out_type == 'error':
-            print(f"[error] {out.get('ename')}: {out.get('evalue')}")
-
-if __name__ == '__main__':
-    if len(sys.argv) < 3: print(__doc__); sys.exit(1)
-    read_cell_output(sys.argv[1], int(sys.argv[2]),
-                     int(sys.argv[3]) if len(sys.argv) > 3 else 100)
+**Install**:
+```bash
+pip install ai-context-tools
 ```
 
-**Usage**:
+**Usage** (after install):
 ```
-python read_cell_output.py experiments/08_foo/notebook.ipynb 14
-python read_cell_output.py experiments/08_foo/notebook.ipynb 14 0   # all lines
+python -m aic_tools.notebook experiments/08_foo/notebook.ipynb 14
+python -m aic_tools.notebook experiments/08_foo/notebook.ipynb 14 0   # all lines
 ```
 
-**Why this works**: `.ipynb` files are plain JSON. The script reads cell outputs directly from disk — no tool size limit applies.
+**Why this works**: `.ipynb` files are plain JSON. The tool reads cell outputs directly from disk — no tool size limit applies.
 
-**Last resort**: Only ask the user to paste output if the script itself is unavailable (e.g., fresh repo with no script yet).
+**Per-repo copilot-instructions.md reference** (propagation template):
+```markdown
+### Notebook cell output reading
+
+Use `python -m aic_tools.notebook <notebook_path> <cell_number> [max_lines]`
+instead of the built-in `read_notebook_cell_output` tool for any cell that has
+`application/vnd.code.notebook.stdout` in its mime types.
+Install once: `pip install ai-context-tools`
+```
+
+**Last resort**: Only ask the user to paste output if the tool is unavailable (e.g., no Python environment yet).
 
 **Propagation requirement**: Working conventions defined in this standard are only effective if they appear in loaded context at session start. The standard document itself is intentionally *not* loaded during initialization. For any convention to be followed consistently, it must be present in `copilot-instructions.md`. Repo maintainers should copy relevant conventions (such as this one) into their `copilot-instructions.md` when adopting them.
 
@@ -1904,9 +1861,9 @@ This is v0.1 - still being validated through actual use.
   - Problem: `read_notebook_cell_output` tool silently fails with "output too large" for stdout-heavy cells
   - Root cause: The failure is predictable and preventable — mime types are visible in `copilot_getNotebookSummary` output BEFORE the tool is called
   - Rule: If a cell has `application/vnd.code.notebook.stdout` in its mime types, skip `read_notebook_cell_output` entirely
-  - Solution: `read_cell_output.py` — a zero-dependency Python script that reads cell outputs directly from the `.ipynb` JSON, bypassing the tool limit
+  - Solution: [`ai-context-tools`](https://github.com/freesemt/ai-context-tools) package (`pip install ai-context-tools`) — `python -m aic_tools.notebook <nb> <cell>` reads the `.ipynb` JSON directly, bypassing the tool limit
   - Principle: Build the tool rather than work around the missing capability
-  - Applies to: Any notebook-heavy repository; script can be dropped into any repo root
+  - Applies to: Any notebook-heavy repository; install once, use everywhere
 
 **v0.8.1** (March 26, 2026)
 - **Corrected `init.prompt.md` frontmatter key**: `mode: ask` → `agent: ask`. VS Code deprecated `mode` in favour of `agent` for prompt file frontmatter; using `mode` produces a deprecation warning. All `init.prompt.md` files in compliant repos should use `agent: ask`.
