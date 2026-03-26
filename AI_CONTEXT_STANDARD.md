@@ -1817,6 +1817,7 @@ This is v0.1 - still being validated through actual use.
 
 **v0.8.1** (March 26, 2026)
 - **Corrected `init.prompt.md` frontmatter key**: `mode: ask` → `agent: ask`. VS Code deprecated `mode` in favour of `agent` for prompt file frontmatter; using `mode` produces a deprecation warning. All `init.prompt.md` files in compliant repos should use `agent: ask`.
+- **Known gap: `alwaysApply: true` is not yet reliably triggered** in all sessions. In practice, `init.prompt.md` does not always auto-execute on chat start even when `alwaysApply: true` is set. Until VS Code guarantees consistent trigger behaviour, **`/init` remains the recommended action at the start of any session where current project status matters**. This is a platform limitation, not a standard flaw — the intent of `alwaysApply: true` remains correct and should be kept in place for when it does fire.
 
 **v0.7** (March 24, 2026)
 - **Complete migration to native auto-load**: `.github/copilot-instructions.md` is now the sole initialization mechanism
