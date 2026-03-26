@@ -609,6 +609,8 @@ python read_cell_output.py experiments/08_foo/notebook.ipynb 14 0   # all lines
 
 **Last resort**: Only ask the user to paste output if the script itself is unavailable (e.g., fresh repo with no script yet).
 
+**Propagation requirement**: Working conventions defined in this standard are only effective if they appear in loaded context at session start. The standard document itself is intentionally *not* loaded during initialization. For any convention to be followed consistently, it must be present in `copilot-instructions.md`. Repo maintainers should copy relevant conventions (such as this one) into their `copilot-instructions.md` when adopting them.
+
 ---
 
 ### Binary File Handling
