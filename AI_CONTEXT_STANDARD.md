@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.7 (Draft)
+**Version**: 0.8.8 (Draft)
 
 ---
 
@@ -222,6 +222,22 @@ cd C:\path\to\repo; git commit -m "..."
 # ✅ Reliable
 git -C C:\path\to\repo commit -m "..."
 ```
+
+### Propagating Cross-repo Conventions to Adopting Repositories
+
+**Problem**: Conventions written in `ai-context-standard/copilot-instructions.md` are only loaded when working in that specific workspace. Other repositories do not read them automatically.
+
+**This is a known limitation**: There is currently no mechanism in GitHub Copilot to inherit conventions from a "parent" standard repository.
+
+**Recommended approach**: When this standard is updated with new cross-repo conventions, manually propagate them to each adopting repository's `copilot-instructions.md`. The trigger for propagation is human judgment — not automation.
+
+**Practical workflow**:
+1. New convention is discovered and documented in `ai-context-standard/copilot-instructions.md`
+2. `AI_CONTEXT_STANDARD.md` version is bumped
+3. Each adopting repo's `copilot-instructions.md` declares its adopted version (e.g. `<!-- AI Context Standard v0.8 - Adopted: 2026-04-02 -->`)
+4. When the version declared in an adopting repo is behind the current standard, that is the signal to review and apply new conventions
+
+**Version gap as a signal**: The adopted version header in each repo's `copilot-instructions.md` serves as a lightweight audit trail. A gap between the declared version and the current standard version means "review and propagate pending conventions."
 
 ---
 
