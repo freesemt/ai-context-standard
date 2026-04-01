@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.5 (Draft)
+**Version**: 0.8.6 (Draft)
 
 ---
 
@@ -176,7 +176,6 @@ alwaysApply: true
 | `copilot-instructions.md` | 静的規約・構造 | 常時・自動・サイレント |
 | `init.prompt.md` (`alwaysApply: true`) | 動的状態の読み込み確認 + バージョンチェック | 新チャット開始時・自動・可視フィードバック付き |
 | `vscode-version.txt` | VS Code バージョン記録 | 手動更新・`init.prompt.md` から参照 |
-| `/memories/`（Copilot ユーザーメモリ） | AI の操作規約・ツール使用パターン | 全セッション・全ワークスペースで自動ロード |
 
 **Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. `/init` can also be used for manual re-initialization mid-session.
 
