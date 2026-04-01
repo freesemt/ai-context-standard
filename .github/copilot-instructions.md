@@ -1,4 +1,4 @@
-<!-- AI Context Standard v0.8 - Adopted: 2026-04-02 -->
+<!-- AI Context Standard v0.8.9 - Adopted: 2026-04-02 -->
 # AI Assistant Initialization Guide — ai-context-standard
 
 **Purpose**: Initialize AI context for working with this repository
