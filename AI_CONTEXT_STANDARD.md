@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.8 (Draft)
+**Version**: 0.8.9 (Draft)
 
 ---
 
@@ -110,72 +110,86 @@ No initialization phrase is required. GitHub Copilot loads `copilot-instructions
 
 **Solution**: Create `.github/prompts/init.prompt.md` with `alwaysApply: true` — runs automatically on every new chat and makes initialization visible.
 
-**VS Code バージョン記録ファイル**: `.github/vscode-version.txt`（自動更新推奨）
+**VS Code version file**: `.github/vscode-version.txt` (auto-update recommended)
 
-`vscode-version-recorder` 拡張機能（https://github.com/freesemt/vscode-version-recorder）をインストールすると、VS Code 起動時に自動で更新されます。
+Install the `vscode-version-recorder` extension (https://github.com/freesemt/vscode-version-recorder) to have it updated automatically on VS Code startup.
 
 ```text
 # VS Code version used in this workspace
 # Auto-updated by vscode-version-recorder extension
 # Required for alwaysApply: true in init.prompt.md (VS Code 1.99+)
-1.114.0-insider
+1.115.0-insider
 ```
 
-**インストール方法**（`gh` CLI が必要）:
+**Installation** (requires `gh` CLI):
 ```powershell
 gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
 code --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
 ```
 
-インストール後 VS Code を再起動すると、以降は自動で `vscode-version.txt` が更新されます。
+After installation, restart VS Code — the file will be updated automatically from then on.
 
-**Note**: 拡張機能を使わない場合は手動でバージョンを記録することも可能です。`init.prompt.md` が拡張機能の有無を自動検出し、未インストールの場合にインストールを案内します。
+**Note**: Manual version recording is also supported. `init.prompt.md` auto-detects whether the extension is installed and guides the user to install it if not.
 
 ```markdown
 ---
 agent: copilot
-description: セッション初期化（PROJECT_STATUS.md の読み込みと確認）
+description: Session initialization (load and summarize PROJECT_STATUS.md)
 alwaysApply: true
 ---
 
-## ステップ1: VS Code バージョン確認
+## Step 1: Check VS Code Version
 
-`<リポジトリ名>` リポジトリの `.github/vscode-version.txt`（このプロンプトファイルと同じリポジトリ）を読んでください。
+Read `.github/vscode-version.txt` in the `<repo-name>` repository (the same repo as this prompt file).
 
-- **バージョン番号が記載されている場合**: そのバージョンを使用してステップ2へ
-- **バージョン番号が未記載またはファイルが存在しない場合**: 以下をユーザーに表示してください：
+- **If the line `Auto-updated by vscode-version-recorder extension` is present**: Extension is working. Use that version and proceed to Step 2.
+- **If a version number is present but that line is missing**: Extension may not be installed. Use the version number and proceed to Step 2. Then ask the user:
 
-  > ⚠️ **VS Code バージョンの記録をお願いします**  
-  > メニュー → **ヘルプ** → **バージョン情報** → 最初の行の番号（例: `1.114.0-insider`）を  
-  > `.github/vscode-version.txt` の末尾に追記してください。
+  > ⚠️ **vscode-version-recorder extension not detected**  
+  > Would you like to install it automatically?
 
-## ステップ2: alwaysApply 対応チェック
+  If the user agrees:
 
-取得したバージョンの数値部分（例: `1.114.0` の `1.114`）が **1.99 以上** かどうか判定してください。
+  ```powershell
+  gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+  ```
 
-- **1.99 以上** → ✅ `alwaysApply: true` が有効です。自動初期化は正常に動作しています。
-- **1.99 未満** → ⚠️ `alwaysApply: true` は動作しません。毎回 `/init` を手動実行してください。
+  Ask the user to **restart VS Code** after installation.
 
-## ステップ3: PROJECT_STATUS.md の要約
+- **If no version is recorded or file does not exist**, display:
 
-`PROJECT_STATUS.md` を読んで、以下を日本語で要約してください：
+  > ⚠️ **Please record your VS Code version**  
+  > Menu → **Help** → **About** → copy the first line (e.g. `1.115.0-insider`)  
+  > and append it to `.github/vscode-version.txt`.
 
-1. **現在のタスク** — 何に取り組んでいるか
-2. **直近の進捗** — 最近完了したこと
-3. **次のステップ** — 優先度順に
+## Step 2: Check alwaysApply Support
 
-最後に「**初期化完了** (リポジトリ名) / VS Code vX.XX.X ✅」と明記してください。
+Extract the numeric part (e.g. `1.115` from `1.115.0-insider`) and check if it is **≥ 1.99**.
+
+- **≥ 1.99** → ✅ `alwaysApply: true` is active. Auto-initialization is working.
+- **< 1.99** → ⚠️ Not supported. Run `/init` manually each session.
+
+## Step 3: Summarize PROJECT_STATUS.md
+
+Read `PROJECT_STATUS.md` and summarize:
+
+1. **Current task** — what is being worked on
+2. **Recent progress** — what was recently completed
+3. **Next steps** — in priority order
+
+End with: "**Initialized** (<repo-name>) / VS Code vX.XX.X ✅"
 ```
 
 **Usage**: `alwaysApply: true` により **新しいチャット開始時に自動実行**されます（VS Code 1.99+）。`/init` で手動再実行も可能です。
 
 **Role separation**:
 
-| ファイル | 役割 | 動作 |
+| File | Role | Behavior |
 |----------|------|------|
-| `copilot-instructions.md` | 静的規約・構造 | 常時・自動・サイレント |
-| `init.prompt.md` (`alwaysApply: true`) | 動的状態の読み込み確認 + バージョンチェック | 新チャット開始時・自動・可視フィードバック付き |
-| `vscode-version.txt` | VS Code バージョン記録 | 手動更新・`init.prompt.md` から参照 |
+| `copilot-instructions.md` | Static conventions and structure | Always on, auto-loaded, silent |
+| `init.prompt.md` (`alwaysApply: true`) | Dynamic state loading + version check | On new chat, auto, with visible feedback |
+| `vscode-version.txt` | VS Code version record | Auto-updated by extension, read by `init.prompt.md` |
 
 **Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. `/init` can also be used for manual re-initialization mid-session.
 
@@ -338,13 +352,13 @@ Optional but helpful:
 **Add version declaration to your INIT file header:**
 
 ```markdown
-<!-- AI Context Standard v0.2 - Adopted: 2026-02-07 -->
+<!-- AI Context Standard v0.8.8 - Adopted: 2026-04-02 -->
 # AI Assistant Initialization Guide
 ```
 
 **For single-file variant:**
 ```markdown
-<!-- AI Context Standard v0.2 - Adopted: 2026-02-07 -->
+<!-- AI Context Standard v0.8.8 - Adopted: 2026-04-02 -->
 # Session Context for Project
 ```
 
