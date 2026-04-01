@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.3 (Draft)
+**Version**: 0.8.4 (Draft)
 
 ---
 
@@ -194,6 +194,22 @@ When you fail the same operation 3+ times, **stop and explain the situation** to
 **Cross-session consistency**: This is a documented working convention, not just "this session's learning." All AI assistants should follow this pattern.
 
 **Real example**: Attempting to delete 1370 lines with replace_string_in_file → Failed 15+ times → Should have stopped at attempt 3-4 and proposed manual deletion.
+
+### PowerShell Terminal: Multi-repo Git Operations
+
+When operating on multiple repositories in sequence via `run_in_terminal`, **always use `git -C <path>`** instead of `cd <path>; git ...`.
+
+**Reason**: The terminal tool may silently strip `cd` from chained commands (`;`-separated), causing git to run in the wrong directory.
+
+```powershell
+# ❌ Unreliable - cd may be stripped by the tool
+cd C:\Users\takahashi\GitHub\humanomics; git commit -m "..."
+
+# ✅ Reliable - no dependency on current directory
+git -C C:\Users\takahashi\GitHub\humanomics commit -m "..."
+```
+
+For non-git commands where `git -C` is not applicable, prepend `Get-Location;` to verify the working directory before executing.
 
 ---
 
