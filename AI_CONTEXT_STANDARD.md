@@ -3,7 +3,18 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.4 (Draft)
+**Version**: 0.8.5 (Draft)
+
+---
+
+> ### 🎯 この標準の核心
+>
+> **コンテキストはリポジトりに管理する。**
+>
+> AI ツールの個人記憶やローカル設定ではなく、リポジト内のファイル（`copilot-instructions.md`、`PROJECT_STATUS.md`）に書く。
+> これにより、チームメンバーや他の AI ツール、将来のセッションでも同じコンテキストが再現される。
+>
+> → **「どこに書くか」を迷ったときは、この原則に立ち返れ。**
 
 ---
 
@@ -165,6 +176,7 @@ alwaysApply: true
 | `copilot-instructions.md` | 静的規約・構造 | 常時・自動・サイレント |
 | `init.prompt.md` (`alwaysApply: true`) | 動的状態の読み込み確認 + バージョンチェック | 新チャット開始時・自動・可視フィードバック付き |
 | `vscode-version.txt` | VS Code バージョン記録 | 手動更新・`init.prompt.md` から参照 |
+| `/memories/`（Copilot ユーザーメモリ） | AI の操作規約・ツール使用パターン | 全セッション・全ワークスペースで自動ロード |
 
 **Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. `/init` can also be used for manual re-initialization mid-session.
 
@@ -172,7 +184,12 @@ alwaysApply: true
 
 ## Working Conventions for AI Assistants
 
-### Failure Recovery Protocol
+**この標準の核心原則に立ち返れ**: AI の操作規約は、この設計文書ではなく、**各リポジトの `copilot-instructions.md`** に記載する。
+そこに書いて初めて、初期化で自動読み込まれ、AI に実際に機能する。
+
+以下は「`copilot-instructions.md` に記載すべき内容」の記述例であり、この文書としてのリファレンスにすぎない。
+
+### 例: Failure Recovery Protocol
 
 When you fail the same operation 3+ times, **stop and explain the situation** to the user.
 
@@ -191,25 +208,21 @@ When you fail the same operation 3+ times, **stop and explain the situation** to
    - Accepting current state if outcome is acceptable
 4. Don't silently struggle through 15+ failed attempts
 
-**Cross-session consistency**: This is a documented working convention, not just "this session's learning." All AI assistants should follow this pattern.
-
 **Real example**: Attempting to delete 1370 lines with replace_string_in_file → Failed 15+ times → Should have stopped at attempt 3-4 and proposed manual deletion.
 
-### PowerShell Terminal: Multi-repo Git Operations
+### 例: PowerShell Terminal ・ Multi-repo Git Operations
 
-When operating on multiple repositories in sequence via `run_in_terminal`, **always use `git -C <path>`** instead of `cd <path>; git ...`.
+When operating on multiple repositories in sequence, **always use `git -C <path>`** instead of `cd <path>; git ...`.
 
-**Reason**: The terminal tool may silently strip `cd` from chained commands (`;`-separated), causing git to run in the wrong directory.
+**Reason**: The terminal tool may silently strip `cd` from chained commands, causing git to run in the wrong directory.
 
 ```powershell
-# ❌ Unreliable - cd may be stripped by the tool
-cd C:\Users\takahashi\GitHub\humanomics; git commit -m "..."
+# ❌ Unreliable
+cd C:\path\to\repo; git commit -m "..."
 
-# ✅ Reliable - no dependency on current directory
-git -C C:\Users\takahashi\GitHub\humanomics commit -m "..."
+# ✅ Reliable
+git -C C:\path\to\repo commit -m "..."
 ```
-
-For non-git commands where `git -C` is not applicable, prepend `Get-Location;` to verify the working directory before executing.
 
 ---
 
