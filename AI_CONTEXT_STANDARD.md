@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.2 (Draft)
+**Version**: 0.8.3 (Draft)
 
 ---
 
@@ -122,14 +122,14 @@ code --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
 
 ```markdown
 ---
-agent: ask
+agent: copilot
 description: セッション初期化（PROJECT_STATUS.md の読み込みと確認）
 alwaysApply: true
 ---
 
 ## ステップ1: VS Code バージョン確認
 
-`.github/vscode-version.txt` を読んでください。
+`<リポジトリ名>` リポジトリの `.github/vscode-version.txt`（このプロンプトファイルと同じリポジトリ）を読んでください。
 
 - **バージョン番号が記載されている場合**: そのバージョンを使用してステップ2へ
 - **バージョン番号が未記載またはファイルが存在しない場合**: 以下をユーザーに表示してください：
