@@ -3,18 +3,18 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.6 (Draft)
+**Version**: 0.8.7 (Draft)
 
 ---
 
-> ### 🎯 この標準の核心
+> ### 🎯 Core Principle
 >
-> **コンテキストはリポジトリで管理する。**
+> **Context lives in the repository.**
 >
-> AI ツールの個人記憶やローカル設定ではなく、リポジトリ内のファイル（`copilot-instructions.md`、`PROJECT_STATUS.md`）に書く。
-> これにより、チームメンバーや他の AI ツール、将来のセッションでも同じコンテキストが再現される。
+> Write to files in the repo (`copilot-instructions.md`, `PROJECT_STATUS.md`), not to personal AI memory or local settings.
+> This ensures that team members, other AI tools, and future sessions all share the same context.
 >
-> → **「どこに書くか」を迷ったときは、この原則に立ち返れ。**
+> → **When in doubt about where to write something, return to this principle.**
 
 ---
 
@@ -183,12 +183,12 @@ alwaysApply: true
 
 ## Working Conventions for AI Assistants
 
-**この標準の核心原則に立ち返れ**: AI の操作規約は、この設計文書ではなく、**各リポジトの `copilot-instructions.md`** に記載する。
-そこに書いて初めて、初期化で自動読み込まれ、AI に実際に機能する。
+**Return to the core principle**: AI operating conventions belong in each repo's **`copilot-instructions.md`**, not in this design document.
+Only there will they be auto-loaded at initialization and actually function.
 
-以下は「`copilot-instructions.md` に記載すべき内容」の記述例であり、この文書としてのリファレンスにすぎない。
+The examples below are reference illustrations of what to write in `copilot-instructions.md` — not active rules in this document.
 
-### 例: Failure Recovery Protocol
+### Example: Failure Recovery Protocol
 
 When you fail the same operation 3+ times, **stop and explain the situation** to the user.
 
@@ -209,7 +209,7 @@ When you fail the same operation 3+ times, **stop and explain the situation** to
 
 **Real example**: Attempting to delete 1370 lines with replace_string_in_file → Failed 15+ times → Should have stopped at attempt 3-4 and proposed manual deletion.
 
-### 例: PowerShell Terminal ・ Multi-repo Git Operations
+### Example: PowerShell Terminal — Multi-repo Git Operations
 
 When operating on multiple repositories in sequence, **always use `git -C <path>`** instead of `cd <path>; git ...`.
 
