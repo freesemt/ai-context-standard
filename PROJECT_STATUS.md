@@ -1,16 +1,25 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-04-02
+**Last Updated**: 2026-04-16
 
 ---
 
 ## 🎯 Current Task
 
-Standard maintenance and self-application: applying the standard to this repository itself.
+Standard maintenance complete. No active task.
 
 ---
 
 ## 📋 Recent Work
+
+### 2026-04-16 (v0.8.9 → v0.9.0 → ongoing)
+
+- **vscode-version-recorder merged into ai-context-vscode**: `updateVersionFiles()` ported into `ai-context-vscode/src/extension.ts`; extension bumped to v0.2.0 with `onStartupFinished` activation
+- **All vscode-version-recorder references replaced**: `AI_CONTEXT_STANDARD.md` install commands, all 11 `init.prompt.md` files across adopting repos updated to reference `freesemt/ai-context-vscode v0.2.0`
+- **`freesemt/vscode-version-recorder` archived** on GitHub (superseded by `ai-context-vscode`)
+- **AI-friendliness as normative principle** (v0.9.0): moved above "examples" disclaimer in `AI_CONTEXT_STANDARD.md`; template `copilot-instructions.md` now includes "AI-Friendliness Scope" subsection
+- **`NOTEBOOK_CONVENTIONS.md` v0.1.0**: published; all adopting repos updated with notebook workflow reference
+- **`freesemt/ai-context-vscode` GitHub repo created and pushed**; `freesemt/ai-context-tools` pushed to PyPI
 
 ### 2026-04-02 (v0.8.2 → v0.8.6)
 
@@ -30,5 +39,5 @@ Standard maintenance and self-application: applying the standard to this reposit
 
 ## ⏳ Next Steps
 
-1. Consider whether `README.md` version line needs updating (`0.8` → `0.8.6`)
+1. Publish `ai-context-vscode` v0.2.0 as a GitHub Release (so `gh release download` works for new adopters)
 2. Consider promoting from Draft toward a stable release
