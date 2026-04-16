@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.8.9 (Draft)
+**Version**: 0.9.0 (Draft)
 
 ---
 
@@ -200,6 +200,23 @@ End with: "**Initialized** (<repo-name>) / VS Code vX.XX.X ✅"
 **Return to the core principle**: AI operating conventions belong in each repo's **`copilot-instructions.md`**, not in this design document.
 Only there will they be auto-loaded at initialization and actually function.
 
+### AI-Friendliness: Full Working Environment
+
+**This is a normative principle of this standard.** Repos adopting this standard should carry it in their `copilot-instructions.md`.
+
+**AI-friendliness** applies to the entire environment an AI assistant works in — not just the Python API surface.
+
+This includes:
+- **Python APIs**: argument names, defaults, return values, error messages
+- **Tools and extensions**: VS Code tools, CLI utilities, notebook output readers
+- **Conventions and documentation**: discoverability of standards, adoption patterns, versioning
+
+The measure is the same in each case: *Can an AI (or any caller without deep prior context) discover and use this correctly without guessing?*
+
+When something fails this test, it is an AI-friendliness issue regardless of whether it is a method signature, a missing extension property, or an undocumented convention.
+
+---
+
 The examples below are reference illustrations of what to write in `copilot-instructions.md` — not active rules in this document.
 
 ### Example: Failure Recovery Protocol
@@ -275,6 +292,12 @@ Recommended sections:
 
 ## 🔑 Working Conventions
 [Document your conventions: notation, symbols, patterns]
+
+### AI-Friendliness Scope
+AI-friendliness applies to the entire working environment: APIs, tools, extensions,
+and conventions — not just code. If an AI cannot discover or use something correctly
+without deep context, it is an AI-friendliness issue.
+See [AI_CONTEXT_STANDARD.md](https://github.com/freesemt/ai-context-standard/blob/main/AI_CONTEXT_STANDARD.md) — "AI-Friendliness: Full Working Environment".
 
 ## 🎯 Repository Context
 [Mission, key insights, current focus]

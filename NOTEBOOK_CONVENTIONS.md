@@ -1,7 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Date**: April 8, 2026  
+**Version**: 0.1.0  
+**Date**: April 16, 2026  
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -44,12 +45,13 @@ Every executable cell starts with a numbered comment on the first line:
 
 ### 3. Cell Output Reading
 
-When built-in notebook output tools return "output too large":
+Use tools in this priority order:
 
-1. Use [`aic_tools.notebook`](https://github.com/freesemt/ai-context-tools) to read the output from the `.ipynb` file on disk
-2. If `aic_tools` is not installed, ask the user — do not silently skip the output
+1. **`aicReadLiveCellOutput`** (preferred) — reads directly from the live VS Code document model; no save required, no size limit. Install [`ai-context-vscode`](https://github.com/freesemt/ai-context-vscode) to enable this tool.
+2. **`aic_tools.notebook`** (fallback) — reads from the `.ipynb` file on disk; reflects the *last saved* state only. Install with `pip install ai-context-tools`.
+3. **Ask the user** — only if neither tool is available; do not silently skip the output.
 
-**Note**: Cell outputs on disk reflect the *last saved* state, not necessarily the live kernel state. After the human runs a cell, the AI should confirm the notebook has been saved before reading outputs from disk.
+**Note on save state**: `aic_tools.notebook` reads from disk, so cell outputs must be saved first. `aicReadLiveCellOutput` has no such requirement — it sees the live state the human sees.
 
 ### 4. Cell Creation and Modification
 
@@ -121,10 +123,14 @@ The specific waiting mechanism is project-dependent. Examples:
 
 ## Tooling
 
-When a friction point cannot be solved by convention alone, a tool belongs in [`ai-context-tools`](https://github.com/freesemt/ai-context-tools).
+When a friction point cannot be solved by convention alone, a tool belongs in one of two packages:
 
-Current tools:
-- `aic_tools.notebook` — reads cell outputs bypassing VS Code's size limit (solves Convention 3)
+**[`ai-context-vscode`](https://github.com/freesemt/ai-context-vscode)** — VS Code extension tools (require VS Code; access the live document model):
+- `aicReadLiveCellOutput` — reads cell output from the live document model; no save required, no size limit (solves Convention 3, preferred)
+- `aicListNotebookCells` — lists all cells with type, execution count, and output summary from the live model
+
+**[`ai-context-tools`](https://github.com/freesemt/ai-context-tools)** — Python package tools (work anywhere; read from disk):
+- `aic_tools.notebook` — reads cell outputs from the saved `.ipynb` file (solves Convention 3, fallback)
 
 Domain-specific readiness checks (Convention 5 and 7 support):
 - `Decomposition.has_rigorous_results(analysis_folder)` — lightweight filesystem check for optimizer results (molass-library). Use in `🔄` progress-check cells.
@@ -143,7 +149,7 @@ Reference this document from your repo's `copilot-instructions.md`:
 
 ```markdown
 ## Notebook workflow
-See [NOTEBOOK_CONVENTIONS.md](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md)
+See [NOTEBOOK_CONVENTIONS.md v0.1.0](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md)
 Kernel preference: global Python (`py`). Do not create venvs.
 ```
 
