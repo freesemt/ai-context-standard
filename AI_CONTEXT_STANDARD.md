@@ -112,7 +112,7 @@ No initialization phrase is required. GitHub Copilot loads `copilot-instructions
 
 **VS Code version file**: `.github/vscode-version.txt` (auto-update recommended)
 
-Install the `vscode-version-recorder` extension (https://github.com/freesemt/vscode-version-recorder) to have it updated automatically on VS Code startup.
+Install the `ai-context-vscode` extension (https://github.com/freesemt/ai-context-vscode) to have it updated automatically on VS Code startup.
 
 ```text
 # VS Code version used in this workspace
@@ -123,11 +123,15 @@ Install the `vscode-version-recorder` extension (https://github.com/freesemt/vsc
 
 **Installation** (requires `gh` CLI):
 ```powershell
-gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
-code --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+code --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
 ```
 
-After installation, restart VS Code — the file will be updated automatically from then on.
+VS Code Insiders users: Use `code-insiders` instead of `code`:
+
+```powershell
+code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
+```
 
 **Note**: Manual version recording is also supported. `init.prompt.md` auto-detects whether the extension is installed and guides the user to install it if not.
 
@@ -145,14 +149,14 @@ Read `.github/vscode-version.txt` in the `<repo-name>` repository (the same repo
 - **If the line `Auto-updated by vscode-version-recorder extension` is present**: Extension is working. Use that version and proceed to Step 2.
 - **If a version number is present but that line is missing**: Extension may not be installed. Use the version number and proceed to Step 2. Then ask the user:
 
-  > ⚠️ **vscode-version-recorder extension not detected**  
+  > ⚠️ **ai-context-vscode extension not detected**  
   > Would you like to install it automatically?
 
   If the user agrees:
 
   ```powershell
-  gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+  gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
   ```
 
   Ask the user to **restart VS Code** after installation.
