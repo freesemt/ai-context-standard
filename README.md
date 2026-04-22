@@ -25,4 +25,4 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 
 ## Version
 
-Current: **0.8.7 (Draft)**
+Current: **0.8.8 (Draft)**

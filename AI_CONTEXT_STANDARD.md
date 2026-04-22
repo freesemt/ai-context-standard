@@ -258,6 +258,39 @@ cd C:\path\to\repo; git commit -m "..."
 git -C C:\path\to\repo commit -m "..."
 ```
 
+### Example: PowerShell Terminal — `gh issue create` with Multi-line Body
+
+For multi-line issue bodies, **write to a temp file first**, then pass `--body-file <path>`. Avoid stdin pipes (`$body | gh ... --body-file -`) — they trigger the VS Code terminal tool's "may be waiting for input" misfire on every call, costing an extra round trip.
+
+```powershell
+# ✅ Preferred — single call, no false interactive-input warning
+$body = @'
+...markdown body...
+'@
+Set-Content -Path "$env:TEMP\issue.md" -Value $body -Encoding UTF8
+gh -R <owner>/<repo> issue create --title "..." --label "enhancement" --body-file "$env:TEMP\issue.md"
+```
+
+Also: **always pass `-R <owner>/<repo>` explicitly** to `gh`. Auto-detection from cwd is unreliable in multi-root workspaces.
+
+In bash, a heredoc into stdin is fine and does not trigger the warning:
+```bash
+gh -R <owner>/<repo> issue create --title "..." --body-file - <<'EOF'
+...markdown body...
+EOF
+```
+
+### Example: PowerShell Text Operations on Non-ASCII Files (CRITICAL)
+
+**Never use PowerShell text ops** (`Get-Content`, `.Replace()`, `[IO.File]::WriteAllText()`, `Set-Content` without explicit `-Encoding UTF8`) on files containing non-ASCII characters.
+
+PowerShell 5.1 defaults to **cp932 (Shift-JIS) on Japanese Windows** (similar issues exist for other locale defaults). It silently garbles UTF-8 multi-byte characters (`–`, `Δ`, `Å`, `→`, `×`, etc.) and **destructively consumes adjacent ASCII bytes** — making automated reversal impossible.
+
+Safe alternatives:
+- AI editing tool (e.g. `replace_string_in_file`)
+- Python `json` module for `.ipynb` files (explicit UTF-8)
+- `Set-Content -Encoding UTF8` when writing — but never read-modify-write text via PS
+
 ### Propagating Cross-repo Conventions to Adopting Repositories
 
 **Problem**: Conventions written in `ai-context-standard/copilot-instructions.md` are only loaded when working in that specific workspace. Other repositories do not read them automatically.

@@ -11,14 +11,14 @@ Read `.github/vscode-version.txt` in the `ai-context-standard` repository (the s
 - **If the line `Auto-updated by vscode-version-recorder extension` is present**: The extension is working correctly. Use that version number and proceed to Step 2.
 - **If a version number is present but that line is missing**: The extension may not be installed. Use the version number and proceed to Step 2. Then ask the user:
 
-  > ⚠️ **vscode-version-recorder extension not detected**  
+  > ⚠️ **ai-context-vscode extension not detected**  
   > Would you like to install it automatically?
 
   If the user agrees, run the following commands:
 
   ```powershell
-  gh release download v0.1.0 --repo freesemt/vscode-version-recorder --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\vscode-version-recorder-0.1.0.vsix"
+  gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2x"
   ```
 
   After installation, ask the user to **restart VS Code**.
