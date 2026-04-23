@@ -1,7 +1,7 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.1  
+**Version**: 0.2.2  
 **Date**: April 23, 2026  
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
@@ -96,6 +96,14 @@ Behavior:
 In practice: after the human runs a `⏳` cell and the result is available, the AI takes over — running the downstream cells, reading outputs, and reporting findings.
 
 This division is **independent of correctness**: the AI can write and prepare `⏳` cells, but should not execute them autonomously.
+
+#### AI cueing
+
+When the AI has completed all preparatory work and a `⏳` cell is the next required step, it should **explicitly prompt the human** rather than stopping silently:
+
+> "Everything is set up. Please run cell [6] ⏳ when ready — I'll take over from cell [6a] onwards once it completes."
+
+This prevents the human from wondering whether the AI is waiting, finished, or stuck.
 
 ### 6. Conformance Declaration
 
