@@ -1,7 +1,7 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.0  
+**Version**: 0.2.1  
 **Date**: April 23, 2026  
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
@@ -64,7 +64,7 @@ The built-in `read_notebook_cell_output` tool may silently fail with "output too
 - **Do not silently delete or reorder cells**: Always confirm with the human
 - **Preserve cell [N] labels**: When editing a cell, keep the `# [N]` comment line consistent with the current numbering
 
-### 5. Long-Running Cells
+### 5. Long-Running Cells and Responsibility Division
 
 Mark long-running cells with `⏳` in the cell ID comment:
 
@@ -83,6 +83,19 @@ Behavior:
 - The AI should not wait or block on `⏳` cells
 - The human runs the cell and reports back when results are ready
 - `🔄` cells are designed for repeated re-running to check status
+
+#### Responsibility division
+
+`⏳` cells define the boundary between human and AI responsibility:
+
+| Responsibility | Cell types | Rationale |
+|---|---|---|
+| **Human** | `⏳` (long-running) | Only the human decides when to spend time; the human can interrupt, retry, or abort |
+| **AI** | All other cells | Setup, analysis, diagnostics, visualization, summaries — fast, deterministic, re-runnable |
+
+In practice: after the human runs a `⏳` cell and the result is available, the AI takes over — running the downstream cells, reading outputs, and reporting findings.
+
+This division is **independent of correctness**: the AI can write and prepare `⏳` cells, but should not execute them autonomously.
 
 ### 6. Conformance Declaration
 
