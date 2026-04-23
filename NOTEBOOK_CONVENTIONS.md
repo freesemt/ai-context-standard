@@ -1,8 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.1.0  
-**Date**: April 16, 2026  
+**Version**: 0.2.0  
+**Date**: April 23, 2026  
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -45,13 +45,18 @@ Every executable cell starts with a numbered comment on the first line:
 
 ### 3. Cell Output Reading
 
-Use tools in this priority order:
+The built-in `read_notebook_cell_output` tool may silently fail with "output too large" even for moderate stdout-heavy cells. Use this fallback chain:
 
 1. **`aicReadLiveCellOutput`** (preferred) — reads directly from the live VS Code document model; no save required, no size limit. Install [`ai-context-vscode`](https://github.com/freesemt/ai-context-vscode) to enable this tool.
-2. **`aic_tools.notebook`** (fallback) — reads from the `.ipynb` file on disk; reflects the *last saved* state only. Install with `pip install ai-context-tools`.
-3. **Ask the user** — only if neither tool is available; do not silently skip the output.
+2. **`aic_tools.notebook`** — reads from the `.ipynb` file on disk; reflects the *last saved* state only.  
+   `py -m aic_tools.notebook <notebook_path> <cell_number> [max_lines]`  
+   Install: `pip install ai-context-tools`. On Windows, prefer the `py` launcher over bare `python` (the latter may resolve to the wrong interpreter or trigger a Microsoft Store stub dialog).
+3. **Raw JSON parse** — last resort; load the `.ipynb` with `json` and walk `cells[i]['outputs']` directly. Useful when only one specific output (e.g. an embedded PNG) is needed.
+4. **Ask the user** — only if none of the above are available; do not silently skip the output.
 
-**Note on save state**: `aic_tools.notebook` reads from disk, so cell outputs must be saved first. `aicReadLiveCellOutput` has no such requirement — it sees the live state the human sees.
+**Note on save state**: options 2 and 3 read from disk, so cell outputs must be saved first. `aicReadLiveCellOutput` has no such requirement — it sees the live state the human sees.
+
+**Widget-rendered outputs**: Figures rendered into `ipywidgets.Output` (interactive dashboards, progress monitors) are **not persisted** to `cell.outputs` — only widget-view metadata is. None of the tools above can recover them. Either ask the user for a screenshot, or have the upstream tool optionally `savefig()` to disk (env-gated). See [ai-context-tools#6](https://github.com/freesemt/ai-context-tools/issues/6).
 
 ### 4. Cell Creation and Modification
 
@@ -149,7 +154,7 @@ Reference this document from your repo's `copilot-instructions.md`:
 
 ```markdown
 ## Notebook workflow
-See [NOTEBOOK_CONVENTIONS.md v0.1.0](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md)
+See [NOTEBOOK_CONVENTIONS.md v0.2.0](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md)
 Kernel preference: global Python (`py`). Do not create venvs.
 ```
 
