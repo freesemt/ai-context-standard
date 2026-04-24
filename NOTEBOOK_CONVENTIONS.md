@@ -1,8 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.2  
-**Date**: April 23, 2026  
+**Version**: 0.2.3  
+**Date**: April 24, 2026  
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -144,6 +144,18 @@ The specific waiting mechanism is project-dependent. Examples:
 - Job queue queries
 
 **Relationship to Convention 5**: The `⏳` cell that *starts* the long-running operation returns immediately. The *result-consuming* cell downstream is the one that waits. The `🔄` progress-check cells remain useful for interactive monitoring but are not required for "Run All" correctness.
+
+### 8. Live Kernel Objects as Ground Truth
+
+When a `⏳` cell returns a result object into kernel scope (a running job handle, a fitted model, a monitor object), that object is the **primary source of truth** for any subsequent status query. Do not bypass it to read raw files on disk.
+
+Priority order:
+
+1. **Live kernel object** — query its properties or methods directly (fastest, always current)
+2. **Saved cell output** — read via `aicReadLiveCellOutput` or `aic_tools.notebook` (reflects last save)
+3. **Raw files on disk** — parse log files, checkpoints, etc. (last resort; only when kernel is unavailable)
+
+Each adopting repo's `copilot-instructions.md` should document what result objects `⏳` cells produce and how to query them.
 
 ---
 
