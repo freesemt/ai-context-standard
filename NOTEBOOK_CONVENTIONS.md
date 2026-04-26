@@ -166,6 +166,7 @@ When a friction point cannot be solved by convention alone, a tool belongs in on
 **[`ai-context-vscode`](https://github.com/freesemt/ai-context-vscode)** — VS Code extension tools (require VS Code; access the live document model):
 - `aicReadLiveCellOutput` — reads cell output from the live document model; no save required, no size limit (solves Convention 3, preferred)
 - `aicListNotebookCells` — lists all cells with type, execution count, and output summary from the live model
+- `aicKernelEval` — evaluates a Python expression in the live Jupyter kernel and returns its `repr`; the canonical way to query kernel-scope objects (long-running job handles, fitted models, monitors) without inserting a new cell (supports Convention 8)
 
 **[`ai-context-tools`](https://github.com/freesemt/ai-context-tools)** — Python package tools (work anywhere; read from disk):
 - `aic_tools.notebook` — reads cell outputs from the saved `.ipynb` file (solves Convention 3, fallback)
