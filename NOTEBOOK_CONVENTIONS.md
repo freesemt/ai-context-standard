@@ -1,7 +1,7 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.4
+**Version**: 0.2.5
 **Date**: April 27, 2026
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
@@ -63,6 +63,28 @@ The built-in `read_notebook_cell_output` tool may silently fail with "output too
 - **Propose before creating**: Describe what the new cell will do and where it will go before inserting it
 - **Do not silently delete or reorder cells**: Always confirm with the human
 - **Preserve cell [N] labels**: When editing a cell, keep the `# [N]` comment line consistent with the current numbering
+
+#### Editing cell source — correct tool order
+
+`.ipynb` files are JSON on disk. `replace_string_in_file` **always fails on notebook cell source** because the tool matches against decoded text, but the file stores JSON-escaped strings (e.g. `\"` on disk vs `"` in the tool's view). The correct tools are:
+
+| Situation | Tool |
+|-----------|------|
+| Edit existing cell content | `edit_notebook_file` with `editType=edit` |
+| Insert a new cell | `edit_notebook_file` with `editType=insert` |
+| Delete a cell | `edit_notebook_file` with `editType=delete` |
+| `replace_string_in_file` fails on a notebook | **Use `edit_notebook_file` instead — never fall back to PowerShell** |
+
+**Never use PowerShell (`Set-Content`, `Get-Content`, `.Replace()`) to edit `.ipynb` files.** Two failure modes:
+- `Set-Content -Encoding utf8` injects a UTF-8 BOM → `JSONDecodeError: Unexpected UTF-8 BOM` → VS Code "Failed to save" error.
+- `Get-Content` without explicit encoding defaults to cp932 (Shift-JIS) on Japanese Windows → silently garbles non-ASCII bytes.
+
+**BOM recovery**: `git checkout <file>`, then:
+```python
+import pathlib
+p = pathlib.Path("notebook.ipynb")
+p.write_text(p.read_text(encoding="utf-8-sig"), encoding="utf-8")
+```
 
 ### 5. Long-Running Cells and Responsibility Division
 
