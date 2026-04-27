@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.9.0 (Draft)
+**Version**: 0.9.1 (Draft)
 
 ---
 
@@ -306,6 +306,32 @@ Safe alternatives:
 4. When the version declared in an adopting repo is behind the current standard, that is the signal to review and apply new conventions
 
 **Version gap as a signal**: The adopted version header in each repo's `copilot-instructions.md` serves as a lightweight audit trail. A gap between the declared version and the current standard version means "review and propagate pending conventions."
+
+### User Memory as a Cross-Project Propagation Layer
+
+**The problem repo-scoped propagation cannot solve**: Even after updating every adopting repo's `copilot-instructions.md`, a new adopter who has never seen those repos starts with no knowledge of the conventions. And conventions that are *personal* (how the AI should behave across all your projects, not in one specific repo) have no natural home in any repo at all.
+
+**User memory fills this gap.** In GitHub Copilot, `/memories/` is loaded automatically in every workspace and every session — it is the one layer that truly spans all projects. This makes it the right place for:
+- **Behavioral defaults** that apply everywhere: tool usage priority orders, general patterns, personal preferences
+- **Cross-project lessons**: a pattern learned in one repo that should apply to all future work
+- **Tool routing rules**: e.g. "prefer async execution for long-running operations" — a rule that applies whether the operation is a notebook cell, a terminal script, or a background job
+
+**What belongs in user memory vs. repo `copilot-instructions.md`**:
+
+| Content type | Where it lives |
+|---|---|
+| Project conventions, architecture, call chains | `copilot-instructions.md` (repo) |
+| Cross-project behavioral defaults | User memory (`/memories/`) |
+| Current task, recent changes | `PROJECT_STATUS.md` (repo) |
+| In-progress session notes | Session memory (`/memories/session/`) |
+
+**Seeding user memory on first adoption**: When an AI assistant encounters this standard for the first time (e.g. by reading `NOTEBOOK_CONVENTIONS.md` or this document), it should proactively ask:
+
+> "I've learned some tool routing rules from this standard (e.g. prefer async execution for long-running operations, `aicReadLiveCellOutput` for notebook output reading). Should I add these to your user memory so they apply in all future projects?"
+
+This is the **correct propagation path** for personal behavioral conventions — not repo files, which are shared and project-scoped.
+
+**Practical note**: User memory is personal and machine-local. It does not spread between team members. Conventions that all collaborators need should still live in `copilot-instructions.md`. User memory is for conventions that apply to *you* across *all your projects*.
 
 ---
 

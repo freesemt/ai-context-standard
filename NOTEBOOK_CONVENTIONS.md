@@ -1,8 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.3  
-**Date**: April 24, 2026  
+**Version**: 0.2.4
+**Date**: April 27, 2026
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -80,8 +80,9 @@ Mark paired "check progress" cells with `🔄`:
 
 Behavior:
 
-- The AI should not wait or block on `⏳` cells
-- The human runs the cell and reports back when results are ready
+- The AI should not block waiting on `⏳` cells
+- The AI can fire `⏳` cells with `aicRunCellAsync` (fire-and-forget) — confirm with the human first, then start without blocking the conversation
+- The human can also run the cell directly and report back when results are ready
 - `🔄` cells are designed for repeated re-running to check status
 
 #### Responsibility division
@@ -90,16 +91,20 @@ Behavior:
 
 | Responsibility | Cell types | Rationale |
 |---|---|---|
-| **Human** | `⏳` (long-running) | Only the human decides when to spend time; the human can interrupt, retry, or abort |
+| **Human or AI** | `⏳` (long-running) | The human decides when to spend time. The AI may fire with `aicRunCellAsync` after confirming — fire-and-forget keeps the conversation responsive. |
 | **AI** | All other cells | Setup, analysis, diagnostics, visualization, summaries — fast, deterministic, re-runnable |
 
-In practice: after the human runs a `⏳` cell and the result is available, the AI takes over — running the downstream cells, reading outputs, and reporting findings.
+In practice: after a `⏳` cell completes (whether fired by the AI with `aicRunCellAsync` or run by the human directly), the AI takes over — running the downstream cells, reading outputs, and reporting findings.
 
-This division is **independent of correctness**: the AI can write and prepare `⏳` cells, but should not execute them autonomously.
+This division is **independent of correctness**: the AI should confirm with the human before firing `⏳` cells.
 
 #### AI cueing
 
 When the AI has completed all preparatory work and a `⏳` cell is the next required step, it should **explicitly prompt the human** rather than stopping silently:
+
+> "Everything is set up. Shall I fire cell [6] ⏳ now? I'll use `aicRunCellAsync` so the conversation stays responsive — I'll monitor progress and take over from cell [6a] once it completes."
+
+Or, if the human prefers to run it:
 
 > "Everything is set up. Please run cell [6] ⏳ when ready — I'll take over from cell [6a] onwards once it completes."
 
@@ -167,6 +172,7 @@ When a friction point cannot be solved by convention alone, a tool belongs in on
 - `aicReadLiveCellOutput` — reads cell output from the live document model; no save required, no size limit (solves Convention 3, preferred)
 - `aicListNotebookCells` — lists all cells with type, execution count, and output summary from the live model
 - `aicKernelEval` — evaluates a Python expression in the live Jupyter kernel and returns its `repr`; the canonical way to query kernel-scope objects (long-running job handles, fitted models, monitors) without inserting a new cell (supports Convention 8)
+- `aicRunCellAsync` — fires a notebook cell and returns immediately (fire-and-forget); keeps the conversation responsive during long-running cells (supports Convention 5)
 
 **[`ai-context-tools`](https://github.com/freesemt/ai-context-tools)** — Python package tools (work anywhere; read from disk):
 - `aic_tools.notebook` — reads cell outputs from the saved `.ipynb` file (solves Convention 3, fallback)

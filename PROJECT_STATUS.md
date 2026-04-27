@@ -1,6 +1,6 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-04-16
+**Last Updated**: 2026-04-27
 
 ---
 
@@ -11,6 +11,14 @@ Standard maintenance complete. No active task.
 ---
 
 ## 📋 Recent Work
+
+### 2026-04-27 (v0.9.0 → v0.9.1)
+
+- **User memory as cross-project propagation layer** (v0.9.1): new section in `AI_CONTEXT_STANDARD.md` documenting user memory as the right home for cross-project behavioral defaults; explains what belongs in user memory vs. repo `copilot-instructions.md`; includes guidance on seeding user memory on first adoption
+- **NOTEBOOK_CONVENTIONS.md v0.2.4**: `aicRunCellAsync` added to Convention 5 (⏳ cells), responsibility table, AI cueing examples, and Tooling section
+- **ai-context-vscode README**: `aicRunCellAsync` tool section added
+
+---
 
 ### 2026-04-16 (v0.8.9 → v0.9.0 → ongoing)
 
