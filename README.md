@@ -21,8 +21,14 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 
 ## Related Tools
 
-- [vscode-version-recorder](https://github.com/freesemt/vscode-version-recorder) — VS Code extension that auto-updates `vscode-version.txt` on startup
+| Repository | Description |
+|---|---|
+| [ai-context-vscode](https://github.com/freesemt/ai-context-vscode) | VS Code extension — auto-updates `vscode-version.txt` on startup |
+| [ai-context-tools](https://github.com/freesemt/ai-context-tools) | Python CLI tools for AI context management (published to PyPI) |
+| [ai-context-standard](https://github.com/freesemt/ai-context-standard) | This repository — the standard document itself |
+
+> Note: `freesemt/vscode-version-recorder` has been archived and superseded by `ai-context-vscode`.
 
 ## Version
 
-Current: **0.8.8 (Draft)**
+Current: **0.9.1 (Draft)**

@@ -1,12 +1,21 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-04-27
+**Last Updated**: 2026-05-03
 
 ---
 
 ## 🎯 Current Task
 
-Standard maintenance complete. No active task.
+Standard maintenance. No active task.
+
+---
+
+## 📋 Recent Work
+
+### 2026-05-03
+
+- **README updated**: Related Tools section updated to reflect current repo names (`ai-context-vscode`, `ai-context-tools`); archived `vscode-version-recorder` noted; version corrected to 0.9.1
+- **Workspace integration**: `ai-context-standard`, `ai-context-tools`, `ai-context-vscode` added to `humanomics-workspace.code-workspace` for unified development
 
 ---
 
