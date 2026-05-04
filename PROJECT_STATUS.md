@@ -1,12 +1,21 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-05-03
+**Last Updated**: 2026-05-05
 
 ---
 
 ## 🎯 Current Task
 
 Standard maintenance. No active task.
+
+---
+
+## 📋 Recent Work
+
+### 2026-05-05 (v0.9.1 → v0.9.2)
+
+- **Initialization visibility revised**: added explicit documentation of the VS Code/Copilot reactive constraint (init confirmation appears in first response, not before it); added "Alternative (VS Code specific): Status bar indicator" section describing `ai-context-vscode` v0.3.2+ status bar feature; role separation table updated with new row and clarified column text; "VS Code specific" framing applied throughout
+- **ai-context-vscode v0.3.2**: added `showAiContextStatusBar()` — reads `PROJECT_STATUS.md` current task from all workspace folders at startup (6s delay), displays in status bar left, click to dismiss; `package.json` command `ai-context-vscode.dismissStatusBar` registered; Node.js upgraded to v24 LTS for packaging
 
 ---
 

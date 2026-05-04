@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.9.1 (Draft)
+**Version**: 0.9.2 (Draft)
 
 ---
 
@@ -187,15 +187,28 @@ End with: "**Initialized** (<repo-name>) / VS Code vX.XX.X ✅"
 
 **Usage**: `alwaysApply: true` により **新しいチャット開始時に自動実行**されます（VS Code 1.99+）。`/init` で手動再実行も可能です。
 
-**Role separation**:
+**Platform constraint**: GitHub Copilot Chat is reactive — it cannot produce output until the user sends a first message. Therefore, `init.prompt.md` confirmation appears at the **top of the first response**, not before it. This is a VS Code platform limitation, not a standard flaw.
 
-| File | Role | Behavior |
+**Alternative (VS Code specific): Status bar indicator**
+
+For immediate visual confirmation before any user message, the `ai-context-vscode` extension (v0.3.2+) displays a status bar item at VS Code startup, showing the current task from each repo's `PROJECT_STATUS.md`. Click to dismiss.
+
+```
+✅ AI Context: humanomics — 対話ページ追加  |  jichikai-2-priv — 年報執筆
+```
+
+This is independent of Copilot Chat and provides initialization visibility at the OS/editor level. It is optional and VS Code specific.
+
+**Role separation** (VS Code):
+
+| Component | Role | Behavior |
 |----------|------|------|
 | `copilot-instructions.md` | Static conventions and structure | Always on, auto-loaded, silent |
-| `init.prompt.md` (`alwaysApply: true`) | Dynamic state loading + version check | On new chat, auto, with visible feedback |
+| `init.prompt.md` (`alwaysApply: true`) | Dynamic state loading + version check | On new chat, auto, with visible feedback in first response |
 | `vscode-version.txt` | VS Code version record | Auto-updated by extension, read by `init.prompt.md` |
+| `ai-context-vscode` status bar (optional) | Current task display | On VS Code startup, always visible, dismissible |
 
-**Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. `/init` can also be used for manual re-initialization mid-session.
+**Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. The status bar shows all repos' current tasks in one line. `/init` can also be used for manual re-initialization mid-session.
 
 ---
 
