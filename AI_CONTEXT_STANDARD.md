@@ -121,17 +121,15 @@ Install the `ai-context-vscode` extension (https://github.com/freesemt/ai-contex
 1.115.0-insider
 ```
 
-**Installation** (requires `gh` CLI):
-```powershell
-gh release download v0.3.2 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
-code --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
-```
-
-VS Code Insiders users: Use `code-insiders` instead of `code`:
+**Installation** — ask the AI agent to install it for you, or run manually:
 
 ```powershell
-code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
+$vsix = "$env:TEMP\ai-context-vscode-0.3.2.vsix"
+Invoke-WebRequest -Uri "https://github.com/freesemt/ai-context-vscode/releases/download/v0.3.2/ai-context-vscode-0.3.2.vsix" -OutFile $vsix
+code-insiders --install-extension $vsix
 ```
+
+(Use `code` instead of `code-insiders` if you are on VS Code Stable.) Restart VS Code after installation.
 
 **Note**: Manual version recording is also supported. `init.prompt.md` auto-detects whether the extension is installed and guides the user to install it if not.
 
@@ -150,16 +148,19 @@ Read `.github/vscode-version.txt` in the `<repo-name>` repository (the same repo
 - **If a version number is present but that line is missing**: Extension may not be installed. Use the version number and proceed to Step 2. Then ask the user:
 
   > ⚠️ **ai-context-vscode extension not detected**  
-  > Would you like to install it automatically?
+  > Would you like me to install it for you? (I'll run the commands — you don't need to do anything except restart VS Code afterwards.)
 
-  If the user agrees:
+  If the user agrees, run these commands:
 
   ```powershell
-  gh release download v0.3.2 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
+  $vsix = "$env:TEMP\ai-context-vscode-0.3.2.vsix"
+  Invoke-WebRequest -Uri "https://github.com/freesemt/ai-context-vscode/releases/download/v0.3.2/ai-context-vscode-0.3.2.vsix" -OutFile $vsix
+  code-insiders --install-extension $vsix
   ```
 
-  Ask the user to **restart VS Code** after installation.
+  (Use `code` instead of `code-insiders` if you are on VS Code Stable.)
+
+  Then tell the user: **Please restart VS Code. After restart, a status bar item will appear showing the current task from each workspace's PROJECT_STATUS.md.**
 
 - **If no version is recorded or file does not exist**, display:
 
