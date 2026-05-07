@@ -123,14 +123,14 @@ Install the `ai-context-vscode` extension (https://github.com/freesemt/ai-contex
 
 **Installation** (requires `gh` CLI):
 ```powershell
-gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
-code --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
+gh release download v0.3.2 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+code --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
 ```
 
 VS Code Insiders users: Use `code-insiders` instead of `code`:
 
 ```powershell
-code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
+code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
 ```
 
 **Note**: Manual version recording is also supported. `init.prompt.md` auto-detects whether the extension is installed and guides the user to install it if not.
@@ -155,8 +155,8 @@ Read `.github/vscode-version.txt` in the `<repo-name>` repository (the same repo
   If the user agrees:
 
   ```powershell
-  gh release download v0.2.0 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
-  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.2.0.vsix"
+  gh release download v0.3.2 --repo freesemt/ai-context-vscode --pattern "*.vsix" --dir $env:TEMP
+  code-insiders --install-extension "$env:TEMP\ai-context-vscode-0.3.2.vsix"
   ```
 
   Ask the user to **restart VS Code** after installation.
@@ -2143,202 +2143,7 @@ This is v0.1 - still being validated through actual use.
 
 ## Version Migration Guide
 
-### Migrating from v0.6 to v0.7
-
-**Summary**: v0.7 retires the magic phrase and Track B entirely. Static conventions now live exclusively in `.github/copilot-instructions.md`. `COPILOT-INIT.md` files should be migrated or removed.
-
-**Is migration required?** Yes — `COPILOT-INIT.md` is no longer part of this standard.
-
-**Migration steps per repository:**
-1. **Update version comment**: `<!-- AI Context Standard v0.7 - Adopted: YYYY-MM-DD -->`
-2. **Create `.github/copilot-instructions.md`**: Copy contents of `COPILOT-INIT.md` into it
-3. **Add `PROJECT_STATUS.md` auto-read directive** (if repo has `PROJECT_STATUS.md`): Insert near the top of `copilot-instructions.md`:
-   ```markdown
-   > **On every session start**: Read [`PROJECT_STATUS.md`](PROJECT_STATUS.md) to get the current task and recent context before responding.
-   ```
-4. **Remove `COPILOT-INIT.md`**: Or replace with a one-line pointer: `This file has been migrated to [.github/copilot-instructions.md](.github/copilot-instructions.md) (AI Context Standard v0.7).`
-5. **Update README**: Remove magic phrase reference; optionally add "context auto-loaded from `.github/copilot-instructions.md`"
-6. **Test**: Open in VS Code Agent mode and verify conventions are active without saying anything
-
-**Effort**:
-- Simple repos: 10-15 minutes (copy + rename + README update)
-- Complex repos with many references: 20-30 minutes
-
-**AI-assisted automatic migration:**
-
-An AI assistant encountering a repository that still has `COPILOT-INIT.md` but no `.github/copilot-instructions.md` **should automatically perform the migration without being asked**, following the steps above. This is the intended behavior once this standard file (`AI_CONTEXT_STANDARD.md`) has been updated to v0.7 in the workspace.
-
-**Trigger condition**: `COPILOT-INIT.md` exists AND `.github/copilot-instructions.md` does not exist.
-
-**Automatic migration checklist:**
-- [ ] Create `.github/copilot-instructions.md` — content from `COPILOT-INIT.md`, with:
-  - Version comment updated to `<!-- AI Context Standard v0.7 - Adopted: YYYY-MM-DD -->`
-  - Magic phrase line removed from header and body
-  - `PROJECT_STATUS.md` auto-read directive added near top (if repo has `PROJECT_STATUS.md`)
-  - Structure maps updated to show `.github/copilot-instructions.md` instead of `COPILOT-INIT.md`
-  - Updates trail: add entry `YYYY-MM-DD | Migrated to .github/copilot-instructions.md (AI Context Standard v0.7)`
-- [ ] Replace `COPILOT-INIT.md` with a one-line pointer (do not delete — preserves git history context)
-- [ ] Update `README.md` if it references the magic phrase or `COPILOT-INIT.md`
-- [ ] Commit with message: `standard: v0.7 — migrate to .github/copilot-instructions.md; retire COPILOT-INIT.md`
-- [ ] Push
-
-**Breaking changes**: `COPILOT-INIT.md` is no longer the standard file; magic phrase is retired
-
-**Backward compatibility**: Copilot will still work with `COPILOT-INIT.md` if you keep it and ask Copilot to read it explicitly — but it is no longer auto-loaded
-
-**New behavior**:
-- No phrase needed at session start
-- Context available immediately in every Agent mode session
-- `PROJECT_STATUS.md` read automatically at session start (via directive in `copilot-instructions.md`)
-
-### Migrating from v0.5 to v0.6
-
-**Summary**: v0.6 introduces the two-track initialization model. The magic phrase still works (Track B) — nothing breaks. The key change is that GitHub Copilot users can now use Track A (auto-load) instead.
-
-**Is migration required?** No — existing `COPILOT-INIT.md` + magic phrase setups remain fully valid as Track B.
-
-**Recommended improvements**:
-1. **Update version comment** in INIT file header: `<!-- AI Context Standard v0.6 - Adopted: YYYY-MM-DD -->`
-2. **If using GitHub Copilot**: Create `.github/copilot-instructions.md` with your static conventions (Track A)
-   - Option A: Duplicate COPILOT-INIT.md content into it
-   - Option B: Have it point to COPILOT-INIT.md with instructions to read it
-   - Option C: Make it the canonical source and retire COPILOT-INIT.md (if Copilot-only team)
-3. **README update**: Remove "magic phrase" mention if switching to Track A; replace with "open in VS Code Agent mode"
-
-**Effort**:
-- Copilot-only team switching to Track A: 15-30 minutes
-- Multi-tool team staying on Track B: 2-5 minutes (version comment only)
-- Hybrid (both tracks): 30-60 minutes
-
-**Breaking changes**: None — all v0.5 setups remain compliant as Track B
-
-**Deprecations**: Magic phrase is not deprecated; it is now Track B (explicit load, tool-agnostic)
-
-**New features**:
-- Track A: zero-friction auto-load for GitHub Copilot users
-- Two-track model for mixed-tool teams
-
-### Migrating from v0.4 to v0.5
-
-**Summary**: v0.5 adds multi-root workspace support conventions. No breaking changes.
-
-**Is migration required?** No - v0.5 is fully backward compatible with v0.4
-
-**Required changes**: None (v0.4 implementations remain compliant)
-
-**Recommended improvements**:
-1. **Update version comment** in INIT file header: `<!-- AI Context Standard v0.5 - Adopted: YYYY-MM-DD -->`
-2. **If using multi-root workspace**: Add ecosystem table + AI-readiness trail to primary `.github/copilot-instructions.md`
-3. **Mark primary repository**: Add `<!-- Primary workspace repository for multi-root workspace -->` comment
-
-**Effort**:
-- Single-repo projects: 2-5 minutes (version comment only)
-- Multi-root workspaces: 15-30 minutes (ecosystem table + AI-readiness trail)
-
-**Breaking changes**: None
-
-**Deprecations**: None
-
-**New features**:
-- Multi-root workspace conventions (Conventions 1-4)
-- AI-readiness trail for workspace-level tracking
-- First-visit protocol for new repositories
-
-### Migrating from v0.3 to v0.4
-
-**Summary**: v0.4 adds axiomatic guidance on human-AI collaboration. No breaking changes.
-
-**Is migration required?** No - v0.4 is fully backward compatible with v0.3
-
-**Required changes**: None (v0.3 implementations remain compliant)
-
-**Recommended improvements**:
-1. **Update version comment** in INIT file header: `<!-- AI Context Standard v0.4 - Adopted: YYYY-MM-DD -->`
-2. **Read "How to Use This Standard"** section to understand collaboration model
-3. **When helping others adopt**: Emphasize collaborative approach over template copying
-
-**Effort**: 2-5 minutes per repository
-
-**Key insight from v0.4**:
-- Standard is axiomatic (minimal essential principles) not prescriptive (detailed templates)
-- AI's high capability can produce "apparent high performance" (perfect template execution) or "true high performance" (creative adaptation through understanding)
-- Axiomatic approach ensures collaboration leads to true high performance
-- Human provides direction, AI provides structure, together discover optimal solution
-
-**Breaking changes**: None
-
-**Deprecations**: None
-
-**New features**:
-- "How to Use This Standard" section (axiomatic principles)
-- Collaborative approach guidance in Steps 1-2
-- Explicit philosophy on simplicity
-
-### Migrating from v0.2 to v0.3
-
-**Summary**: v0.3 adds failure recovery protocol and large document management. No breaking changes.
-
-**Is migration required?** No - v0.3 is fully backward compatible with v0.2
-
-**Required changes**: None (v0.2 implementations remain compliant)
-
-**Recommended improvements**:
-1. **Update version comment** in INIT file header: `<!-- AI Context Standard v0.3 - Adopted: YYYY-MM-DD -->`
-2. **Review failure recovery protocol**: AI assistants working in this repo should follow 3-failure stop rule
-3. **Consider Step 7**: If any documents exceed 500 lines with multiple topics, apply topic-splitting
-
-**Effort**: 5-10 minutes per repository
-
-**Breaking changes**: None
-
-**Deprecations**: None
-
-**New features**:
-- Working Conventions for AI Assistants (failure recovery protocol)
-- Step 7: Large Document Management for AI context efficiency
-- Topic-based file splitting pattern
-- Windows PowerShell large deletion workaround
-
-### Migrating from v0.1 to v0.2
-
-**Summary**: v0.2 clarifies STATIC/DYNAMIC terminology throughout. No breaking changes.
-
-**Is migration required?** No - v0.2 is fully backward compatible with v0.1
-
-**Required changes**: None (v0.1 implementations remain compliant)
-
-**Recommended improvements**:
-1. **Add version comment** to INIT file header: `<!-- AI Context Standard v0.2 - Adopted: YYYY-MM-DD -->`
-2. **Add STATIC/DYNAMIC labels** to section headers for clarity:
-   - INIT sections: "STATIC Conventions" or similar
-   - STATUS sections: "DYNAMIC State" or "DYNAMIC History"
-3. **Review enhanced guidance**: Check updated Content Boundaries and Decision Tree
-4. **Consider single-file variant** if appropriate for your project size
-
-**Effort**: 5-10 minutes per repository
-
-**Compatibility matrix**:
-- v0.1 INIT files → Compatible with v0.2 (no changes needed)
-- v0.1 STATUS files → Compatible with v0.2 (no changes needed)
-- Single-file approach → Officially recognized in v0.2
-
-**Breaking changes**: None
-
-**Deprecations**: None
-
-**New features**:
-- Single-file variant officially documented
-- Enhanced STATIC/DYNAMIC terminology
-- Version tracking recommendations
-- Migration guidance (this section)
-
-### Future Migrations
-
-As the standard evolves, this section will document:
-- Breaking changes (if any)
-- Required vs. recommended updates
-- Migration effort estimates
-- Compatibility information
+This section will document migration steps when a significant new version is released with breaking changes.
 
 **Promise**: Backward compatibility will be maintained whenever possible. Breaking changes will be clearly marked and thoroughly justified.
 
