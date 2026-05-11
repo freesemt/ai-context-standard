@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.9.2 (Draft)
+**Version**: 0.10.0 (Draft)
 
 ---
 
@@ -209,7 +209,7 @@ This is independent of Copilot Chat and provides initialization visibility at th
 | `vscode-version.txt` | VS Code version record | Auto-updated by extension, read by `init.prompt.md` |
 | `ai-context-vscode` status bar (optional) | Current task display | On VS Code startup, always visible, dismissible |
 
-**Multi-root workspace**: In a workspace with multiple repositories, each `init.prompt.md` runs automatically on new chat start, reading that repo's `PROJECT_STATUS.md`. The status bar shows all repos' current tasks in one line. `/init` can also be used for manual re-initialization mid-session.
+**Multi-root workspace**: In a workspace with multiple repositories, all repos' `copilot-instructions.md` files are auto-loaded simultaneously. If a coordinator repo is designated (presence of `WORKSPACE_STATUS.md`), `init.prompt.md` reads it for the current task; otherwise it falls back to the repo's own `PROJECT_STATUS.md`. The status bar shows all repos' current tasks in one line. `/init` can also be used for manual re-initialization mid-session.
 
 ---
 
@@ -1462,9 +1462,139 @@ Once you've implemented the pattern, periodically audit for content boundary vio
 
 ---
 
-## Multi-Repository Workflow
+## Multi-Repository and Multi-Root Workspace
 
-### Using Standard Across Multiple Repositories
+### Single-Repo vs. Multi-Root Workspace
+
+Two scenarios apply this standard differently:
+
+- **Single repo**: One `copilot-instructions.md`, one `PROJECT_STATUS.md`. The standard applies as documented in Steps 1–5.
+- **Multi-root workspace**: Multiple repos open simultaneously in VS Code. All repos' `copilot-instructions.md` files are auto-loaded. A workspace-level coordinator pattern handles "current task" ambiguity.
+
+---
+
+### Multi-Root Workspace: Coordinator Pattern
+
+**Problem**: When multiple repos each contain a `PROJECT_STATUS.md` with a "current task," the AI has no principled way to know which one is the active focus.
+
+**Solution**: Designate one repo as the workspace coordinator. Its presence is signaled by `WORKSPACE_STATUS.md`.
+
+#### The Coordinator Signal
+
+**Presence of `WORKSPACE_STATUS.md` in a repo designates it as the workspace coordinator.**
+
+- No declaration field is required — the file's existence is the signal
+- Exactly one coordinator at a time
+- Coordinator can change as focus shifts between repos
+
+#### Content Ownership
+
+| File | Owner | Answers |
+|---|---|---|
+| `WORKSPACE_STATUS.md` | Coordinator repo only | "What are we working on right now?" — may span multiple repos |
+| `PROJECT_STATUS.md` | Every repo | "What is the latest state of this repo?" — no "current task" section |
+
+**Key rule**: Per-repo `PROJECT_STATUS.md` files do **not** claim a "current task." They track repo-local state (recent changes, open issues, repo condition). Only `WORKSPACE_STATUS.md` owns the current task.
+
+#### Coordinator Transition
+
+To shift coordinator from Repo A to Repo B:
+1. Create `WORKSPACE_STATUS.md` in Repo B (with current cross-repo task and context)
+2. Delete or archive `WORKSPACE_STATUS.md` in Repo A (optionally leave a note: "Coordinator transferred to <repo-name>, <date>")
+3. One git commit in each repo
+
+**Backward compatibility**: If no `WORKSPACE_STATUS.md` exists anywhere in the workspace, `init.prompt.md` falls back to reading `PROJECT_STATUS.md` — single-repo behavior is unchanged.
+
+#### Init Behavior
+
+`init.prompt.md` uses presence-based routing:
+
+- **If `WORKSPACE_STATUS.md` exists in this repo** → read it for current task; read per-repo `PROJECT_STATUS.md` for repo-specific detail as needed
+- **If no `WORKSPACE_STATUS.md`** → read `PROJECT_STATUS.md` (single-repo fallback, backward compatible)
+
+**Non-coordinator repos**: Do not have `init.prompt.md` with `alwaysApply: true` that summarizes a "current task." Their `copilot-instructions.md` is auto-loaded as static context only.
+
+#### Convention 1: Coordinator Designation
+
+Optionally declare coordinator status in `copilot-instructions.md` for human readers:
+
+```markdown
+<!-- Workspace coordinator for <workspace-name> -->
+```
+
+This comment is informational — the `WORKSPACE_STATUS.md` file is the authoritative signal.
+
+#### Convention 2: Repository Ecosystem Table
+
+**In the coordinator's `copilot-instructions.md`**, document all active repositories:
+
+```markdown
+## Repository Ecosystem (Multi-Root Workspace)
+
+| Repository | Role | AI Context File | Status |
+|------------|------|-----------------|--------|
+| coordinator-repo | Workspace coordinator | copilot-instructions.md | Active |
+| lib-repo | Library / core code | copilot-instructions.md | Active |
+| docs-repo | Documentation | copilot-instructions.md | Active |
+| legacy-repo | Legacy codebase | copilot-instructions.md | Reference |
+```
+
+**Purpose**: AI orients to the full ecosystem from the coordinator's instructions, without surveying all repos at each session.
+
+**Maintenance**: Update when repos are added, removed, or change role.
+
+#### Convention 3: First-Visit Protocol
+
+When AI visits a repository for the first time (no INIT file, or INIT has no version comment):
+
+1. **Survey**: Check for `.github/copilot-instructions.md` and `PROJECT_STATUS.md`
+2. **Create**: If absent, offer to create them with a brief survey of the repo
+3. **Link**: Reference the new repo in the coordinator's ecosystem table
+4. **Update**: Add an entry to the AI-readiness trail (Convention 4)
+
+**Scope**: "First visit" = no INIT file present, or INIT file has no `<!-- AI Context Standard v0.X -->` comment.
+
+#### Convention 4: AI-Readiness Trail
+
+**Add to coordinator's `copilot-instructions.md`** a dated tracking table:
+
+```markdown
+## AI-Readiness Trail
+
+| Date | Repository | Action | Standard Version |
+|------|------------|--------|------------------|
+| 2026-02-19 | modeling-vs-model_free | INIT/STATUS created, ecosystem table added | v0.5 |
+| 2026-02-19 | molass-library | INIT/STATUS surveyed, links verified | v0.5 |
+```
+
+**Purpose**: Track when each repository was last surveyed and which standard version was applied.
+
+**Benefits**:
+- Quick identification of repos needing first-visit protocol
+- Historical record of AI context evolution across the workspace
+- Enables quarterly maintenance review without re-examining all repos
+
+#### Integration Model
+
+```
+Workspace (VS Code multi-root)
+├── Coordinator Repo
+│   ├── .github/copilot-instructions.md  ← Auto-loaded (static conventions + ecosystem table)
+│   ├── WORKSPACE_STATUS.md              ← Current cross-repo task (single source of truth)
+│   └── PROJECT_STATUS.md               ← This repo's local state (no "current task")
+├── Repo B
+│   ├── .github/copilot-instructions.md  ← Auto-loaded (per-repo conventions)
+│   └── PROJECT_STATUS.md               ← This repo's local state (no "current task")
+└── Repo C
+    ├── .github/copilot-instructions.md  ← Auto-loaded (per-repo conventions)
+    └── PROJECT_STATUS.md               ← This repo's local state (no "current task")
+```
+
+**No new file types required beyond `WORKSPACE_STATUS.md`**: Conventions 2–4 use existing file types with additional sections in the coordinator.
+
+---
+
+### Multi-Repository: Standard Adoption Tracking
 
 When implementing this pattern across multiple repositories, you need systematic tracking and feedback loops.
 
@@ -1674,95 +1804,6 @@ Use in Repo C ──→ Same issue ──→ Pattern confirmed!
 - Decide on version updates (v0.1 → v0.2)
 - Clean up resolved patterns
 - Plan adoption for new repos
-
----
-
-### Multi-Root Workspace Support
-
-When a **VS Code multi-root workspace** has multiple repositories open simultaneously, additional conventions help AI assistants navigate the workspace effectively.
-
-**Context**: VS Code supports opening multiple repository folders in a single workspace window. In this configuration, GitHub Copilot loads `copilot-instructions.md` from **all** open repositories simultaneously. This is an advantage — conventions from all repos are available at once.
-
-#### Convention 1: Primary Repository Declaration
-
-Designate one repository as the **primary workspace repository** — the one whose `copilot-instructions.md` declares the workspace ecosystem table (Convention 2).
-
-**Where to declare**: At the top of `.github/copilot-instructions.md`:
-
-```markdown
-<!-- Primary workspace repository for multi-root workspace -->
-```
-
-**Why needed**: In multi-root workspaces, the primary repo's instructions should declare the ecosystem overview so AI can orient to the full workspace structure at a glance.
-
-#### Convention 2: Repository Ecosystem Table
-
-**In the primary repository's `copilot-instructions.md`**, add an ecosystem table documenting all active repositories:
-
-```markdown
-## Repository Ecosystem (Multi-Root Workspace)
-
-| Repository | Role | AI Context File | Status |
-|------------|------|-----------------|--------|
-| primary-repo | Primary workspace repo | copilot-instructions.md | Active |
-| lib-repo | Library / core code | copilot-instructions.md | Active |
-| docs-repo | Documentation | copilot-instructions.md | Active |
-| legacy-repo | Legacy codebase | copilot-instructions.md | Reference |
-```
-
-**Purpose**: AI assistants can orient to the full ecosystem after reading primary INIT, without needing to survey all repos on every session.
-
-**Maintenance**: Update when repos are added, removed, or change role.
-
-#### Convention 3: First-Visit Protocol
-
-When AI visits a repository for the first time (no INIT file, or INIT has no version comment):
-
-1. **Survey**: Check for `.github/copilot-instructions.md` and `PROJECT_STATUS.md`
-2. **Create**: If absent, offer to create them with a brief survey of the repo
-3. **Link**: Reference the new repo in the primary repository's ecosystem table
-4. **Update**: Add an entry to the AI-readiness trail (Convention 4)
-
-**Scope**: "First visit" = no INIT file present, or INIT file has no `<!-- AI Context Standard v0.X -->` comment.
-
-#### Convention 4: AI-Readiness Trail
-
-**Add to primary `copilot-instructions.md`** a dated tracking table:
-
-```markdown
-## AI-Readiness Trail
-
-| Date | Repository | Action | Standard Version |
-|------|------------|--------|-----------------|
-| 2026-02-19 | modeling-vs-model_free | INIT/STATUS created, ecosystem table added | v0.5 |
-| 2026-02-19 | molass-library | INIT/STATUS surveyed, links verified | v0.5 |
-```
-
-**Purpose**: Track when each repository was last surveyed and which standard version was applied.
-
-**Benefits**:
-- Quick identification of repos needing first-visit protocol
-- Historical record of AI context evolution across the workspace
-- Enables quarterly maintenance review without re-examining all repos
-
-#### Integration Model
-
-**Workspace layer** (multi-root) overlays the **repository layer** (per-repo INIT/STATUS):
-
-```
-Workspace (VS Code multi-root)
-├── Primary Repo (copilot-instructions.md with ecosystem table + AI-readiness trail)
-│   ├── .github/copilot-instructions.md  ← Auto-loaded first (primary)
-│   └── PROJECT_STATUS.md
-├── Repo B
-│   ├── .github/copilot-instructions.md  ← Auto-loaded (per-repo conventions)
-│   └── PROJECT_STATUS.md
-└── Repo C
-    ├── .github/copilot-instructions.md  ← Auto-loaded (per-repo conventions)
-    └── PROJECT_STATUS.md
-```
-
-**No new file types**: Multi-root support uses existing `copilot-instructions.md`/STATUS files with additional sections in the primary repository — no new file types or protocols required.
 
 ---
 
@@ -2001,18 +2042,33 @@ This is v0.1 - still being validated through actual use.
    - Still testing: Optimal topic granularity, red flags for when NOT to split, long-term maintenance
    - AI behavior pattern: Stop after 3 failures, propose manual operation for large edits (100+ lines)
 
-11. **Multi-root workspace patterns** (Added v0.5 — still testing):
-   - Does Convention 1 (primary repo declaration) work cleanly with different AI tool behaviors?
-   - What is the right granularity for the ecosystem table? (per-repo vs. per-folder)
-   - Should the AI-readiness trail live in `copilot-instructions.md` or a separate file?
-   - How does session resumption work when focus shifts between repos mid-session?
-   - Are Conventions 1-4 sufficient, or are additional workspace-level conventions needed?
+11. **Multi-root workspace patterns** (Updated v0.10.0 — coordinator pattern added):
+   - ✅ "Current task" ambiguity resolved: `WORKSPACE_STATUS.md` presence designates coordinator; only it holds current task
+   - ✅ Coordinator transition defined: create/delete `WORKSPACE_STATUS.md` (presence-based, one git commit per repo)
+   - ✅ Init routing defined: `WORKSPACE_STATUS.md` present → coordinator mode; else fallback to `PROJECT_STATUS.md`
+   - Still testing: Does the coordinator pattern work smoothly when focus shifts between repos mid-session?
+   - Still testing: What is the right granularity for the ecosystem table? (per-repo vs. per-folder)
+   - Still testing: Should the AI-readiness trail live in `copilot-instructions.md` or a separate file?
 
 **Test these through use, then refine the standard based on answers.**
 
 ---
 
 ## Version History
+
+**v0.10.0** (May 11, 2026)
+- **Added "Multi-Root Workspace: Coordinator Pattern"** to the multi-repository section
+  - `WORKSPACE_STATUS.md` presence in a repo designates it as the workspace coordinator — no declaration field needed
+  - `WORKSPACE_STATUS.md` is the single source of truth for "current task" across all repos in the workspace
+  - Per-repo `PROJECT_STATUS.md` tracks repo-local state only — no "current task" section
+  - Coordinator transition: create in new coordinator, delete/archive from old one (one git commit per repo)
+  - Init routing: `init.prompt.md` reads `WORKSPACE_STATUS.md` if present; falls back to `PROJECT_STATUS.md` for single-repo compatibility
+  - Non-coordinator repos: `copilot-instructions.md` auto-loaded as static context; no `init.prompt.md` claiming current task
+- **Unified "Multi-Repository Workflow" and "Multi-Root Workspace Support"** into single section "Multi-Repository and Multi-Root Workspace"
+  - Old Convention 1 (primary repo comment) replaced by coordinator signal (`WORKSPACE_STATUS.md` presence)
+  - Conventions 2–4 (ecosystem table, first-visit protocol, AI-readiness trail) retained with coordinator terminology
+  - Added "Single-Repo vs. Multi-Root Workspace" intro subsection
+- **Bumped to v0.10.0**: coordinator pattern is a significant conceptual addition for multi-repo workspaces
 
 **v0.8.2** (March 26, 2026)
 - **Added "Notebook Cell Output Reading" convention** to "Working Conventions for AI Assistants"
