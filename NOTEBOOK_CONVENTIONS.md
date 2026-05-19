@@ -1,8 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.5
-**Date**: April 27, 2026
+**Version**: 0.2.6
+**Date**: May 19, 2026
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -184,6 +184,42 @@ Priority order:
 
 Each adopting repo's `copilot-instructions.md` should document what result objects `⏳` cells produce and how to query them.
 
+### 9. KaTeX Math in Markdown Cells
+
+Jupyter renders math with **KaTeX**, not MathJax. KaTeX supports most common LaTeX math
+but has a stricter, smaller command set. Constructs that render correctly on GitHub (MathJax)
+or in LaTeX may silently fail or raise a parse error in Jupyter.
+
+**Known unsafe constructs:**
+
+| Avoid | Reason | Safe replacement |
+|---|---|---|
+| `\!` (negative thin space) | Not supported in KaTeX | Remove, or use `\,` (thin space) |
+| `\text{word }` with trailing space | KaTeX parse error | `\text{word}` (no trailing space) |
+| `\max\!\left(` | `\!` before `\left` is KaTeX-illegal | `\max\left(` |
+| `K_{\text{SEC}}` | Safe in KaTeX but `\text` in subscripts can fail in some renderers | `K_{\rm SEC}` |
+
+**Recommended patterns:**
+
+```latex
+% roman text in subscripts
+K_{\rm SEC}          % preferred over K_{\text{SEC}}
+
+% spacing
+\qquad               % large space (safe)
+\quad                % medium space (safe)
+\,                   % thin space (safe)
+% NOT \!             -- negative thin space, KaTeX-unsafe
+
+% domain restriction inline
+K_{\rm SEC}(R_p) = \left(1 - \frac{R_g}{R_p}\right)^2 \qquad (R_p > R_g)
+```
+
+**Diagnosis**: A KaTeX parse error shows a red error token in the rendered cell.
+The exact offending command is not always shown. If math renders on GitHub but fails in
+Jupyter, check first for `\!`, trailing spaces in `\text{}`, and any commands from
+[KaTeX's unsupported list](https://katex.org/docs/support_table).
+
 ---
 
 ## Tooling
@@ -216,7 +252,7 @@ Reference this document from your repo's `copilot-instructions.md`:
 
 ```markdown
 ## Notebook workflow
-Read [NOTEBOOK_CONVENTIONS.md v0.2.5](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.
+Read [NOTEBOOK_CONVENTIONS.md v0.2.6](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.
 Kernel preference: global Python (`py`). Do not create venvs.
 ```
 
