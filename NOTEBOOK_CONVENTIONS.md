@@ -1,8 +1,8 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.6
-**Date**: May 19, 2026
+**Version**: 0.2.7
+**Date**: May 25, 2026
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
 ---
@@ -70,10 +70,11 @@ The built-in `read_notebook_cell_output` tool may silently fail with "output too
 
 | Situation | Tool |
 |-----------|------|
-| Edit existing cell content | `edit_notebook_file` with `editType=edit` |
+| Edit existing cell content (notebook open in VS Code) | `aicEditNotebookCell` — writes to the live model; markdown cells re-render automatically |
+| Edit existing cell content (no open editor) | `edit_notebook_file` with `editType=edit` |
 | Insert a new cell | `edit_notebook_file` with `editType=insert` |
 | Delete a cell | `edit_notebook_file` with `editType=delete` |
-| `replace_string_in_file` fails on a notebook | **Use `edit_notebook_file` instead — never fall back to PowerShell** |
+| `replace_string_in_file` fails on a notebook | **Use `aicEditNotebookCell` or `edit_notebook_file` — never fall back to PowerShell** |
 
 **Never use PowerShell (`Set-Content`, `Get-Content`, `.Replace()`) to edit `.ipynb` files.** Two failure modes:
 - `Set-Content -Encoding utf8` injects a UTF-8 BOM → `JSONDecodeError: Unexpected UTF-8 BOM` → VS Code "Failed to save" error.
@@ -231,6 +232,7 @@ When a friction point cannot be solved by convention alone, a tool belongs in on
 - `aicListNotebookCells` — lists all cells with type, execution count, and output summary from the live model
 - `aicKernelEval` — evaluates a Python expression in the live Jupyter kernel and returns its `repr`; the canonical way to query kernel-scope objects (long-running job handles, fitted models, monitors) without inserting a new cell (supports Convention 8)
 - `aicRunCellAsync` — fires a notebook cell and returns immediately (fire-and-forget); keeps the conversation responsive during long-running cells (supports Convention 5)
+- `aicEditNotebookCell` — edits cell source in the live document model; markdown cells are automatically re-rendered after the edit (supports Convention 4)
 
 **[`ai-context-tools`](https://github.com/freesemt/ai-context-tools)** — Python package tools (work anywhere; read from disk):
 - `aic_tools.notebook` — reads cell outputs from the saved `.ipynb` file (solves Convention 3, fallback)
@@ -252,7 +254,7 @@ Reference this document from your repo's `copilot-instructions.md`:
 
 ```markdown
 ## Notebook workflow
-Read [NOTEBOOK_CONVENTIONS.md v0.2.6](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.
+Read [NOTEBOOK_CONVENTIONS.md v0.2.7](https://github.com/freesemt/ai-context-standard/blob/main/NOTEBOOK_CONVENTIONS.md) before working with any notebook in this repo.
 Kernel preference: global Python (`py`). Do not create venvs.
 ```
 
