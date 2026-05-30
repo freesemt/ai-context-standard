@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.10.0 (Draft)
+**Version**: 0.10.1 (Draft)
 
 ---
 
@@ -119,6 +119,13 @@ Install the `ai-context-vscode` extension (https://github.com/freesemt/ai-contex
 # Auto-updated by vscode-version-recorder extension
 # Required for alwaysApply: true in init.prompt.md (VS Code 1.99+)
 1.115.0-insider
+```
+
+Since this file is machine-local, add it to `.gitignore`:
+
+```text
+# Machine-local files
+.github/vscode-version.txt
 ```
 
 **Installation** — ask the AI agent to install it for you, or run manually:
@@ -2055,6 +2062,9 @@ This is v0.1 - still being validated through actual use.
 ---
 
 ## Version History
+
+**v0.10.1** (May 30, 2026)
+- **Added `.gitignore` recommendation for `vscode-version.txt`**: Since `.github/vscode-version.txt` is machine-local, it should be excluded from version control. Added `.gitignore` snippet alongside the VS Code version file documentation.
 
 **v0.10.0** (May 11, 2026)
 - **Added "Multi-Root Workspace: Coordinator Pattern"** to the multi-repository section

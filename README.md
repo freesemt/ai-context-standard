@@ -31,4 +31,4 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 
 ## Version
 
-Current: **0.9.1 (Draft)**
+Current: **0.10.1 (Draft)**
