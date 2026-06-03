@@ -1,7 +1,7 @@
 # Notebook Collaboration Conventions
 
 **Status**: Draft  
-**Version**: 0.2.7
+**Version**: 0.2.8
 **Date**: May 25, 2026
 **Context**: Companion to [AI Context Standard](AI_CONTEXT_STANDARD.md) for Jupyter notebook workflows in VS Code Agent mode
 
@@ -236,6 +236,11 @@ When a friction point cannot be solved by convention alone, a tool belongs in on
 
 **[`ai-context-tools`](https://github.com/freesemt/ai-context-tools)** — Python package tools (work anywhere; read from disk):
 - `aic_tools.notebook` — reads cell outputs from the saved `.ipynb` file (solves Convention 3, fallback)
+- `aic_tools.marimo_session` — reads marimo notebook cell outputs from the session cache (`__marimo__/session/<name>.py.json`). Use for console/text output without screenshots. Reports embedded PNG outputs as size summaries (use `screenshot_page()` to view figures). Not applicable to Jupyter notebooks.
+  ```
+  python -m aic_tools.marimo_session <notebook.py>          # list all cells
+  python -m aic_tools.marimo_session <notebook.py> <N>      # read cell N (1-based)
+  ```
 
 Domain-specific readiness checks (Convention 5 and 7 support):
 - `Decomposition.has_rigorous_results(analysis_folder)` — lightweight filesystem check for optimizer results (molass-library). Use in `🔄` progress-check cells.

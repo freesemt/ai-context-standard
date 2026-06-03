@@ -1,6 +1,6 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-05-05
+**Last Updated**: 2026-06-03
 
 ---
 
@@ -11,6 +11,10 @@ Standard maintenance. No active task.
 ---
 
 ## 📋 Recent Work
+
+### 2026-06-03 (v0.2.7 → v0.2.8, NOTEBOOK_CONVENTIONS.md)
+
+- **`aic_tools.marimo_session` added to Tooling section**: reads marimo session cache (`__marimo__/session/*.json`) for console/text output without screenshots; routing rule by output type documented; CLI usage shown. Added to `ai-context-tools` v0.8.7.
 
 ### 2026-05-05 (v0.9.1 → v0.9.2)
 
