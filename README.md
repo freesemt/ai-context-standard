@@ -15,6 +15,13 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 | `.github/prompts/init.prompt.md` | Initialization visibility + version check | Rarely |
 | `.github/vscode-version.txt` | VS Code version record | Auto (via extension) |
 
+## Companion Documents
+
+| Document | Purpose |
+|----------|---------|
+| [NOTEBOOK_CONVENTIONS.md](NOTEBOOK_CONVENTIONS.md) | Jupyter notebook workflow conventions (cell output reading, execution, editing) |
+| [TOOL_ROUTING_RULES.md](TOOL_ROUTING_RULES.md) | File editing safety — prevents corruption through systematic tool selection |
+
 ## Read the Standard
 
 → [AI_CONTEXT_STANDARD.md](AI_CONTEXT_STANDARD.md)

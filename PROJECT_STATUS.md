@@ -1,6 +1,6 @@
 # Project Status — ai-context-standard
 
-**Last Updated**: 2026-06-03
+**Last Updated**: 2026-06-22
 
 ---
 
@@ -11,6 +11,11 @@ Standard maintenance. No active task.
 ---
 
 ## 📋 Recent Work
+
+### 2026-06-22 (v0.10.1, TOOL_ROUTING_RULES.md added)
+
+- **TOOL_ROUTING_RULES.md v0.1.0 created**: systematic tool selection for file operations; mandatory pre-write checklist added; routing table covers `.ipynb` (JSON escaping + BOM), `.html` duplicates (line-based edit), PowerShell hazards on Japanese Windows (cp932 garbling); decision flow diagram; references to `aic-edit-lines` (ai-context-tools v0.8.8), `edit_notebook_file`, `aicEditNotebookCell`; companion to NOTEBOOK_CONVENTIONS.md
+- **README.md updated**: added "Companion Documents" section listing NOTEBOOK_CONVENTIONS.md and TOOL_ROUTING_RULES.md
 
 ### 2026-06-03 (v0.2.7 → v0.2.8, NOTEBOOK_CONVENTIONS.md)
 
