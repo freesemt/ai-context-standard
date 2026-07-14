@@ -2,7 +2,7 @@
 
 **Purpose**: Prevent file corruption and tool misuse through systematic tool selection  
 **Created**: June 22, 2026  
-**Version**: 0.1.0 (Draft)  
+**Version**: 0.1.1 (Draft)  
 **Part of**: [AI Context Standard v0.10.1](AI_CONTEXT_STANDARD.md)
 
 ---
@@ -192,7 +192,34 @@ p.write_text(p.read_text(encoding="utf-8-sig"), encoding="utf-8")
 
 ---
 
+## Deferred Tool Loading (VS Code Agent Mode)
+
+In VS Code Agent mode, many tools are **deferred** — they are not loaded into the agent's active tool set until explicitly requested via `tool_search`. Calling a deferred tool without first loading it causes a **silent hang** with no error message.
+
+**Deferred tools that require `tool_search` first**:
+- `aicEditNotebookCell`, `edit_notebook_file`, `aicReadLiveCellOutput`
+- `aicRunCellAsync`, `aicListNotebookCells`, `aicKernelEval`
+- `copilot_getNotebookSummary`, `run_notebook_cell`
+- `github-pull-request_*`, `mcp_gitkraken_cli_*`
+
+**Rule**: Before calling ANY tool with `aic`, `edit_notebook`, `copilot_get`, `run_notebook`, or `github-pull-request` in its name, call `tool_search` first:
+
+```python
+tool_search("read notebook cell output")   # → loads aicReadLiveCellOutput
+tool_search("edit notebook cell")          # → loads aicEditNotebookCell
+tool_search("list notebook cells")         # → loads aicListNotebookCells
+```
+
+**Symptom of violation**: The agent's response is sent but nothing happens. The chat appears to hang. The user must retry.
+
+**Fallback when unsure**: Provide the code/content directly in the chat response instead of calling the tool. This avoids the dependency entirely.
+
+---
+
 ## Updates
+
+**Version 0.1.1** (July 14, 2026):
+- Added "Deferred Tool Loading" section: rule for calling `tool_search` before deferred tools to prevent silent hangs
 
 **Version 0.1.0** (June 22, 2026):
 - Initial release
