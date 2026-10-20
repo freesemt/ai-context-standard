@@ -1,7 +1,7 @@
 ---
-agent: copilot
-description: Session initialization (load and summarize PROJECT_STATUS.md)
-alwaysApply: true
+name: init
+description: "Session initialization (load and summarize PROJECT_STATUS.md)"
+disable-model-invocation: true
 ---
 
 ## Step 1: Check VS Code Version
