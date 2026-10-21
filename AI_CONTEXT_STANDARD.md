@@ -3,7 +3,7 @@
 **Status**: Proposal for community discussion  
 **Author**: Discovered through practical use across multiple repositories  
 **Date**: March 26, 2026  
-**Version**: 0.10.2 (Draft)
+**Version**: 0.10.3 (Draft)
 
 ---
 
@@ -303,12 +303,7 @@ EOF
 
 ### Example: PowerShell Terminal — Native-command Output and Commit Messages
 
-Four quirks of Windows PowerShell 5.1 that cost extra round trips (found in molass-researcher, 2026-10):
-
-- **A red `NativeCommandError` is not a failure.** Anything a native command writes to stderr is wrapped as an error record, and the exit code may read 1. This includes `git push` / `fetch` / `clone` progress and `gh` status lines such as `✓ Closed issue ...`. Judge success by the command's own result line (`a1b2c3d..e4f5a6b  main -> main`, `✓ Closed issue`) or `git -C <repo> status -sb`. Do not retry the command because of the red text.
-- **Commit messages: write to a file and use `-F`.** `git commit -F -` fed from a here-string fails, and multi-line `-m` quoting is fragile. Create the message file with the editor's file-creation tool (use a fresh name — create tools refuse to overwrite), then run `git -C <repo> commit -F <file>`. Keep trailers such as `Co-authored-by:` in the file.
-- **Buffered output.** `| Select-Object -Last N` (and `| Out-String` on long pipelines) prints nothing until the process ends. A silent long-running command is expected; do not kill it.
-- **Batched tool calls run in parallel.** A call that reads an artifact (PNG, JSON, a file written by a script) must be in a later batch than the call that produces it.
+Moved to the companion document **[TERMINAL_CONVENTIONS.md](TERMINAL_CONVENTIONS.md)** (single source of truth; adopting repos only point to it): a red `NativeCommandError` is not a failure, commit messages go through a file (`git commit -F`), `Select-Object -Last N` buffers output, and batched tool calls run in parallel.
 
 ### Example: PowerShell Text Operations on Non-ASCII Files (CRITICAL)
 
@@ -2071,6 +2066,9 @@ This is v0.1 - still being validated through actual use.
 ---
 
 ## Version History
+
+**v0.10.3** (October 21, 2026)
+- **Moved the PowerShell native-command rules to a companion document, `TERMINAL_CONVENTIONS.md` v0.1.0** (single source of truth). Adopting repos carry a pointer section only, like "Notebook workflow" / `NOTEBOOK_CONVENTIONS.md`; the v0.10.2 example in this file is now a pointer. Reason: copying the rules into every repo (v0.10.2 propagation) duplicated them 15 times.
 
 **v0.10.2** (October 21, 2026)
 - **Added "PowerShell Terminal — Native-command Output and Commit Messages"** example: a red `NativeCommandError` after `git push` / `gh` is stderr progress, not failure; write commit messages to a file and use `git commit -F`; `Select-Object -Last N` buffers output; batched tool calls run in parallel. Origin: AI-friendliness review of a molass-researcher session.

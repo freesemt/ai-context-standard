@@ -21,6 +21,7 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 |----------|---------|
 | [NOTEBOOK_CONVENTIONS.md](NOTEBOOK_CONVENTIONS.md) | Jupyter notebook workflow conventions (cell output reading, execution, editing) |
 | [TOOL_ROUTING_RULES.md](TOOL_ROUTING_RULES.md) | File editing safety — prevents corruption through systematic tool selection |
+| [TERMINAL_CONVENTIONS.md](TERMINAL_CONVENTIONS.md) | Windows PowerShell terminal quirks for `git` / `gh` (red `NativeCommandError` ≠ failure, commit messages via file, buffered output, parallel tool batches); repos point to it instead of copying it |
 
 ## Read the Standard
 
@@ -38,4 +39,4 @@ A practical standard discovered through real-world use with GitHub Copilot acros
 
 ## Version
 
-Current: **0.10.2 (Draft)**
+Current: **0.10.3 (Draft)**

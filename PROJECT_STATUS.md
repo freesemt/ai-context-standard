@@ -12,6 +12,10 @@ Standard maintenance. No active task.
 
 ## 📋 Recent Work
 
+### 2026-10-21 (v0.10.3, TERMINAL_CONVENTIONS.md added)
+
+- **TERMINAL_CONVENTIONS.md v0.1.0 created** (single source of truth): the four PowerShell native-command conventions added in v0.10.2 moved out of `AI_CONTEXT_STANDARD.md` and out of 15 adopting repos' `copilot-instructions.md`; each repo now carries a 2-line pointer section (paste-in snippet at the end of the document), like `NOTEBOOK_CONVENTIONS.md`. README "Companion Documents" updated.
+
 ### 2026-10-21 (v0.10.2)
 
 - **Added "PowerShell Terminal — Native-command Output and Commit Messages"** to `AI_CONTEXT_STANDARD.md`: red `NativeCommandError` ≠ failure (judge by the result line), commit messages via file + `git commit -F`, `Select-Object -Last N` buffering, parallel batched tool calls. Moved here from molass-researcher's `copilot-instructions.md` so all adopting repos can share it.

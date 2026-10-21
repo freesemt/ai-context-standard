@@ -12,6 +12,7 @@
 1. **This file** — working conventions and repository structure
 2. **PROJECT_STATUS.md** — current version, recent changes, next steps
 3. **AI_CONTEXT_STANDARD.md** — the standard itself (primary artifact)
+4. **Companion documents** (adopting repos point to these instead of copying them): `NOTEBOOK_CONVENTIONS.md`, `TOOL_ROUTING_RULES.md`, `TERMINAL_CONVENTIONS.md`
 
 ---
 
@@ -74,7 +75,7 @@ cd C:\path\to\repo; git commit -m "..."
 git -C C:\path\to\repo commit -m "..."
 ```
 
-**PowerShell native-command output and commit messages** (v0.10.2, full text in `AI_CONTEXT_STANDARD.md`): a red `NativeCommandError` after `git push` / `gh` is stderr progress, not failure — judge by the result line; write commit messages to a fresh file and use `git commit -F <file>`; `Select-Object -Last N` buffers output; batched tool calls run in parallel.
+**PowerShell native-command output and commit messages**: see [TERMINAL_CONVENTIONS.md](../TERMINAL_CONVENTIONS.md) (red `NativeCommandError` ≠ failure; commit messages via file + `git commit -F`; buffered output; parallel tool batches). Read it before committing or pushing from a terminal.
 
 ---
 
