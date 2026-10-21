@@ -74,6 +74,8 @@ cd C:\path\to\repo; git commit -m "..."
 git -C C:\path\to\repo commit -m "..."
 ```
 
+**PowerShell native-command output and commit messages** (v0.10.2, full text in `AI_CONTEXT_STANDARD.md`): a red `NativeCommandError` after `git push` / `gh` is stderr progress, not failure — judge by the result line; write commit messages to a fresh file and use `git commit -F <file>`; `Select-Object -Last N` buffers output; batched tool calls run in parallel.
+
 ---
 
 ## 💡 Quick Tips for AI Assistants
